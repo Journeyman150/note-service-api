@@ -7,7 +7,7 @@ import (
 )
 
 func (n *Note) CreateNote(ctx context.Context, req *desc.CreateNoteRequest) (*desc.CreateNoteResponse, error) {
-	fmt.Println("CreateNote")
+	fmt.Println("Create Note")
 	fmt.Println("title:", req.GetTitle())
 	fmt.Println("text:", req.GetText())
 	fmt.Println("author:", req.GetAuthor())

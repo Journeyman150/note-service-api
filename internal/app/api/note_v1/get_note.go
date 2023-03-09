@@ -8,7 +8,7 @@ import (
 
 func (n *Note) GetNote(ctx context.Context, req *desc.GetNoteRequest) (*desc.GetNoteResponse, error) {
 	fmt.Println("Get note")
-	fmt.Println("Id:", req.GetId())
+	fmt.Println("Note Id:", req.GetId())
 	fmt.Println()
 	return &desc.GetNoteResponse{
 		Title: "Title received",

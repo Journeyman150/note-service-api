@@ -74,6 +74,16 @@ func main() {
 	if err != nil {
 		log.Println(err.Error())
 	}
-	log.Println("Note with Id", update.GetId(), "updated")
+	log.Println("Note with Id =", update.GetId(), "updated")
+	log.Println()
+
+	//delete
+	del, err := client.DeleteNote(context.Background(), &desc.DeleteNoteRequest{
+		Id: 1,
+	})
+	if err != nil {
+		log.Println(err.Error())
+	}
+	log.Println("Note with Id =", del.GetId(), "deleted")
 	log.Println()
 }
