@@ -11,6 +11,7 @@ func (n *Note) CreateNote(ctx context.Context, req *desc.CreateNoteRequest) (*de
 	fmt.Println("title:", req.GetTitle())
 	fmt.Println("text:", req.GetText())
 	fmt.Println("author:", req.GetAuthor())
+	fmt.Println()
 
 	return &desc.CreateNoteResponse {
 		Id: 1,
