@@ -1,10 +1,11 @@
 package main
 
 import (
-	"log"
 	"context"
-	"google.golang.org/grpc"
+	"log"
+
 	desc "github.com/Journeyman150/note-service-api/pkg/note_v1"
+	"google.golang.org/grpc"
 )
 
 const address = "localhost:50051"
@@ -34,7 +35,7 @@ func main() {
 	//get
 	id := int64(1)
 	get, err := client.GetNote(context.Background(), &desc.GetNoteRequest{
-		Id:  id,
+		Id: id,
 	})
 	if err != nil {
 		log.Println(err.Error())
@@ -66,24 +67,24 @@ func main() {
 	//update
 	newTitle := "updated title"
 	newText := "updated text"
-	update, err := client.Update(context.Background(), &desc.UpdateNoteRequest{
-		Id: 1,
-		Title:  &newTitle,
-		Text:   &newText,
+	_, err = client.Update(context.Background(), &desc.UpdateNoteRequest{
+		Id:    1,
+		Title: &newTitle,
+		Text:  &newText,
 	})
 	if err != nil {
 		log.Println(err.Error())
 	}
-	log.Println("Note with Id =", update.GetId(), "updated")
+	log.Println("Note updated")
 	log.Println()
 
 	//delete
-	del, err := client.DeleteNote(context.Background(), &desc.DeleteNoteRequest{
+	_, err = client.DeleteNote(context.Background(), &desc.DeleteNoteRequest{
 		Id: 1,
 	})
 	if err != nil {
 		log.Println(err.Error())
 	}
-	log.Println("Note with Id =", del.GetId(), "deleted")
+	log.Println("Note deleted")
 	log.Println()
 }

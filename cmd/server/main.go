@@ -5,9 +5,9 @@ import (
 	"log"
 	"net"
 
-	"google.golang.org/grpc"
-	desc "github.com/Journeyman150/note-service-api/pkg/note_v1"
 	"github.com/Journeyman150/note-service-api/internal/app/api/note_v1"
+	desc "github.com/Journeyman150/note-service-api/pkg/note_v1"
+	"google.golang.org/grpc"
 )
 
 const port = ":50051"

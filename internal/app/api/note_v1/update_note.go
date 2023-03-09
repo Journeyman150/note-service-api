@@ -3,15 +3,16 @@ package note_v1
 import (
 	"context"
 	"fmt"
+
 	desc "github.com/Journeyman150/note-service-api/pkg/note_v1"
 )
 
-func (n *Note) Update(ctx context.Context, req *desc.UpdateNoteRequest) (*desc.UpdateNoteResponse, error) {
+func (n *Note) Update(ctx context.Context, req *desc.UpdateNoteRequest) (*desc.Empty, error) {
 	fmt.Println("Update note")
 	fmt.Println("Note Id:", req.GetId())
 	fmt.Println("New values:")
 	if len(req.GetTitle()) != 0 {
-	fmt.Println("title:", req.GetTitle())
+		fmt.Println("title:", req.GetTitle())
 	}
 	if len(req.GetText()) != 0 {
 		fmt.Println("text:", req.GetText())
@@ -20,7 +21,5 @@ func (n *Note) Update(ctx context.Context, req *desc.UpdateNoteRequest) (*desc.U
 		fmt.Println("author:", req.GetAuthor())
 	}
 	fmt.Println()
-	return &desc.UpdateNoteResponse {
-		Id: req.GetId(),
-	}, nil
+	return &desc.Empty{}, nil
 }
