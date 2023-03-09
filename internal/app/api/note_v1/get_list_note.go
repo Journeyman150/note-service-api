@@ -8,6 +8,7 @@ import (
 
 func (n *Note) GetListNote(ctx context.Context, req *desc.GetListNoteRequest) (*desc.GetListNoteResponse, error) {
 	fmt.Println("Get list note")
+	fmt.Println()
 	return &desc.GetListNoteResponse {
 		Notes: []*desc.GetNoteResponse {
 			{

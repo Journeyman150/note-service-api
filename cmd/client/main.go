@@ -62,4 +62,18 @@ func main() {
 	} else {
 		log.Println("No notes found")
 	}
+
+	//update
+	newTitle := "updated title"
+	newText := "updated text"
+	update, err := client.Update(context.Background(), &desc.UpdateNoteRequest{
+		Id: 1,
+		Title:  &newTitle,
+		Text:   &newText,
+	})
+	if err != nil {
+		log.Println(err.Error())
+	}
+	log.Println("Note with Id", update.GetId(), "updated")
+	log.Println()
 }
