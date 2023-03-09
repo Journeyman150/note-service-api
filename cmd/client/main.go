@@ -17,6 +17,8 @@ func main() {
 	defer con.Close()
 
 	client := desc.NewNoteV1Client(con)
+
+	//create
 	res, err := client.CreateNote(context.Background(), &desc.CreateNoteRequest{
 		Title:  "Some title",
 		Text:   "Some text",
@@ -25,9 +27,11 @@ func main() {
 	if err != nil {
 		log.Println(err.Error())
 	}
-	log.Println("Client created")
-	log.Printf("Client Id: %d\n\n", res.Id)
+	log.Println("Note created")
+	log.Println("Note Id:", res.GetId())
+	log.Println()
 
+	//get
 	id := int64(1)
 	get, err := client.GetNote(context.Background(), &desc.GetNoteRequest{
 		Id:  id,
@@ -35,8 +39,27 @@ func main() {
 	if err != nil {
 		log.Println(err.Error())
 	}
-	log.Println("Client with Id =", id, "received")
-	log.Println("Title:", get.Title)
-	log.Println("Author:", get.Author)
-	log.Println("Text:", get.Text)
+	log.Println("Note with Id =", id, "received")
+	log.Println("Title:", get.GetTitle())
+	log.Println("Author:", get.GetAuthor())
+	log.Println("Text:", get.GetText())
+	log.Println()
+
+	//getList
+	getList, err := client.GetListNote(context.Background(), &desc.GetListNoteRequest{})
+	if err != nil {
+		log.Println(err.Error())
+	}
+	if len(getList.Notes) != 0 {
+		log.Println("All notes received")
+		for i, note := range getList.Notes {
+			log.Println("Note", i+1)
+			log.Println("Title:", note.GetTitle())
+			log.Println("Author:", note.GetAuthor())
+			log.Println("Text:", note.GetText())
+			log.Println()
+		}
+	} else {
+		log.Println("No notes found")
+	}
 }
