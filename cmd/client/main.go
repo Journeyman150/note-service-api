@@ -73,13 +73,34 @@ func main() {
 	if err != nil {
 		log.Println(err.Error())
 	}
+	loc, err = time.LoadLocation("Europe/Moscow")
+	if err != nil {
+		log.Println(err.Error())
+	}
 	if len(getList.Notes) != 0 {
 		log.Println("All notes received")
 		for i, note := range getList.Notes {
 			log.Println("Note", i+1)
+			createdAt, err := time.Parse(time.RFC3339, note.GetCreatedAt())
+			if err != nil {
+				log.Println(err.Error())
+			}
+			var updatedAt time.Time
+			if len(note.UpdatedAt) != 0 {
+				updatedAt, err = time.Parse(time.RFC3339, note.GetUpdatedAt())
+				if err != nil {
+					log.Println(err.Error())
+				}
+			}
 			log.Println("Title:", note.GetTitle())
 			log.Println("Author:", note.GetAuthor())
 			log.Println("Text:", note.GetText())
+			log.Println("Created at:", createdAt.In(loc).Format(time.UnixDate))
+			if !updatedAt.IsZero() {
+				log.Println("Updated at:", updatedAt.In(loc).Format(time.UnixDate))
+			} else {
+				log.Println("Updated at: Note has never been updated")
+			}
 			log.Println()
 		}
 	} else {
