@@ -111,7 +111,7 @@ func main() {
 	newTitle := "updated title"
 	newText := "updated text"
 	_, err = client.Update(context.Background(), &desc.UpdateNoteRequest{
-		Id:    1,
+		Id:    3,
 		Title: &newTitle,
 		Text:  &newText,
 	})
