@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"time"
 
 	desc "github.com/Journeyman150/note-service-api/pkg/note_v1"
 	"google.golang.org/grpc"
@@ -33,17 +34,38 @@ func main() {
 	log.Println()
 
 	//get
-	id := int64(1)
+	id := int64(2)
 	get, err := client.GetNote(context.Background(), &desc.GetNoteRequest{
 		Id: id,
 	})
 	if err != nil {
 		log.Println(err.Error())
 	}
+	loc, err := time.LoadLocation("Europe/Moscow")
+	if err != nil {
+		log.Println(err.Error())
+	}
+	createdAt, err := time.Parse(time.RFC3339, get.GetCreatedAt())
+	if err != nil {
+		log.Println(err.Error())
+	}
+	var updatedAt time.Time
+	if len(get.UpdatedAt) != 0 {
+		updatedAt, err = time.Parse(time.RFC3339, get.GetUpdatedAt())
+		if err != nil {
+			log.Println(err.Error())
+		}
+	}
 	log.Println("Note with Id =", id, "received")
 	log.Println("Title:", get.GetTitle())
 	log.Println("Author:", get.GetAuthor())
 	log.Println("Text:", get.GetText())
+	log.Println("Created at:", createdAt.In(loc).Format(time.UnixDate))
+	if !updatedAt.IsZero() {
+		log.Println("Updated at:", updatedAt.In(loc).Format(time.UnixDate))
+	} else {
+		log.Println("Updated at: Note has never been updated")
+	}
 	log.Println()
 
 	//getList
