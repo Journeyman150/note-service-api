@@ -5,10 +5,9 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/jmoiron/sqlx"
-
 	desc "github.com/Journeyman150/note-service-api/pkg/note_v1"
 	sq "github.com/Masterminds/squirrel"
+	"github.com/jmoiron/sqlx"
 )
 
 func (n *Note) GetNote(ctx context.Context, req *desc.GetNoteRequest) (*desc.GetNoteResponse, error) {

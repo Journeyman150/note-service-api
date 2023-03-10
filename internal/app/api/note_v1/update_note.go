@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	desc "github.com/Journeyman150/note-service-api/pkg/note_v1"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
-
-	desc "github.com/Journeyman150/note-service-api/pkg/note_v1"
 )
 
 func (n *Note) Update(ctx context.Context, req *desc.UpdateNoteRequest) (*desc.Empty, error) {
