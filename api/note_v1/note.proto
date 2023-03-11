@@ -4,6 +4,8 @@ package api.note_v1;
 
 option go_package = "github.com/Journeyman150/note-service-api/pkg/note_v1";
 
+import "google/protobuf/timestamp.proto";
+
 service NoteV1 {
     rpc CreateNote (CreateNoteRequest) returns (CreateNoteResponse);
     rpc GetNote (GetNoteRequest) returns (GetNoteResponse);
@@ -30,6 +32,8 @@ message GetNoteResponse {
     string title = 1;
     string text = 2;
     string author = 3;
+    google.protobuf.Timestamp created_at = 4;
+    google.protobuf.Timestamp updated_at = 5;
 }
 
 message GetListNoteRequest {}
