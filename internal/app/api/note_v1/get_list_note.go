@@ -24,7 +24,7 @@ func (n *Note) GetListNote(ctx context.Context, req *desc.GetListNoteRequest) (*
 	defer db.Close()
 
 	builder := sq.Select("title, text, author, created_at, updated_at").
-		From(noteTable)
+		From(noteTable).PlaceholderFormat(sq.Dollar)
 
 	query, args, err := builder.ToSql()
 	if err != nil {
@@ -47,14 +47,13 @@ func (n *Note) GetListNote(ctx context.Context, req *desc.GetListNoteRequest) (*
 		if updatedAt.Valid {
 			checkedUpdatedAt = timestamppb.New(updatedAt.Time)
 		}
-		note := desc.GetNoteResponse{
+		noteList = append(noteList, &desc.GetNoteResponse{
 			Title:     title,
 			Text:      text,
 			Author:    author,
 			CreatedAt: timestamppb.New(createdAt),
 			UpdatedAt: checkedUpdatedAt,
-		}
-		noteList = append(noteList, &note)
+		})
 		if err != nil {
 			return nil, err
 		}

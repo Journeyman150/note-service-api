@@ -25,7 +25,7 @@ func (n *Note) GetNote(ctx context.Context, req *desc.GetNoteRequest) (*desc.Get
 
 	builder := sq.Select("title, text, author, created_at, updated_at").
 		From(noteTable).
-		Where("id = ?", req.GetId()).
+		Where(sq.Eq{"id": req.GetId()}).
 		PlaceholderFormat(sq.Dollar)
 
 	query, args, err := builder.ToSql()

@@ -34,7 +34,7 @@ func (n *Note) Update(ctx context.Context, req *desc.UpdateNoteRequest) (*desc.E
 	}
 
 	builder = builder.Set("updated_at", time.Now().UTC().Format(time.RFC3339)).
-		Where("id = ?", req.GetId()).
+		Where(sq.Eq{"id": req.GetId()}).
 		PlaceholderFormat(sq.Dollar)
 
 	query, args, err := builder.ToSql()
