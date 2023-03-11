@@ -24,7 +24,8 @@ func (n *Note) GetListNote(ctx context.Context, req *desc.GetListNoteRequest) (*
 	defer db.Close()
 
 	builder := sq.Select("title, text, author, created_at, updated_at").
-		From(noteTable).PlaceholderFormat(sq.Dollar)
+		From(noteTable).
+		PlaceholderFormat(sq.Dollar)
 
 	query, args, err := builder.ToSql()
 	if err != nil {

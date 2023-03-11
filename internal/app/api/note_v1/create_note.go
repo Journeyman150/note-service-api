@@ -32,10 +32,10 @@ func (n *Note) CreateNote(ctx context.Context, req *desc.CreateNoteRequest) (*de
 	defer db.Close()
 
 	builder := sq.Insert(noteTable).
-		PlaceholderFormat(sq.Dollar).
 		Columns("title, text, author").
 		Values(req.GetTitle(), req.GetText(), req.GetAuthor()).
-		Suffix("returning id")
+		Suffix("returning id").
+		PlaceholderFormat(sq.Dollar)
 
 	query, args, err := builder.ToSql()
 	if err != nil {
