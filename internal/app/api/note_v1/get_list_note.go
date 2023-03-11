@@ -4,10 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"time"
 
 	desc "github.com/Journeyman150/note-service-api/pkg/note_v1"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (n *Note) GetListNote(ctx context.Context, req *desc.GetListNoteRequest) (*desc.GetListNoteResponse, error) {
@@ -35,17 +37,22 @@ func (n *Note) GetListNote(ctx context.Context, req *desc.GetListNoteRequest) (*
 	}
 	defer row.Close()
 
-	var title, text, author, createdAt string
-	var updatedAt sql.NullString
+	var title, text, author string
+	var createdAt time.Time
+	var updatedAt sql.NullTime
 	noteList := make([]*desc.GetNoteResponse, 0, 10)
 	for row.Next() {
 		err = row.Scan(&title, &text, &author, &createdAt, &updatedAt)
+		var checkedUpdatedAt *timestamppb.Timestamp
+		if updatedAt.Valid {
+			checkedUpdatedAt = timestamppb.New(updatedAt.Time)
+		}
 		note := desc.GetNoteResponse{
 			Title:     title,
 			Text:      text,
 			Author:    author,
-			CreatedAt: createdAt,
-			UpdatedAt: updatedAt.String,
+			CreatedAt: timestamppb.New(createdAt),
+			UpdatedAt: checkedUpdatedAt,
 		}
 		noteList = append(noteList, &note)
 		if err != nil {

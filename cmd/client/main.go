@@ -45,24 +45,14 @@ func main() {
 	if err != nil {
 		log.Println(err.Error())
 	}
-	createdAt, err := time.Parse(time.RFC3339, get.GetCreatedAt())
-	if err != nil {
-		log.Println(err.Error())
-	}
-	var updatedAt time.Time
-	if len(get.UpdatedAt) != 0 {
-		updatedAt, err = time.Parse(time.RFC3339, get.GetUpdatedAt())
-		if err != nil {
-			log.Println(err.Error())
-		}
-	}
+
 	log.Println("Note with Id =", id, "received")
 	log.Println("Title:", get.GetTitle())
 	log.Println("Author:", get.GetAuthor())
 	log.Println("Text:", get.GetText())
-	log.Println("Created at:", createdAt.In(loc).Format(time.UnixDate))
-	if !updatedAt.IsZero() {
-		log.Println("Updated at:", updatedAt.In(loc).Format(time.UnixDate))
+	log.Println("Created at:", get.GetCreatedAt().AsTime().In(loc).Format(time.UnixDate))
+	if get.GetUpdatedAt().IsValid() {
+		log.Println("Updated at:", get.GetUpdatedAt().AsTime().In(loc).Format(time.UnixDate))
 	} else {
 		log.Println("Updated at: Note has never been updated")
 	}
@@ -81,23 +71,12 @@ func main() {
 		log.Println("All notes received")
 		for i, note := range getList.Notes {
 			log.Println("Note", i+1)
-			createdAt, err := time.Parse(time.RFC3339, note.GetCreatedAt())
-			if err != nil {
-				log.Println(err.Error())
-			}
-			var updatedAt time.Time
-			if len(note.UpdatedAt) != 0 {
-				updatedAt, err = time.Parse(time.RFC3339, note.GetUpdatedAt())
-				if err != nil {
-					log.Println(err.Error())
-				}
-			}
 			log.Println("Title:", note.GetTitle())
 			log.Println("Author:", note.GetAuthor())
 			log.Println("Text:", note.GetText())
-			log.Println("Created at:", createdAt.In(loc).Format(time.UnixDate))
-			if !updatedAt.IsZero() {
-				log.Println("Updated at:", updatedAt.In(loc).Format(time.UnixDate))
+			log.Println("Created at:", note.GetCreatedAt().AsTime().In(loc).Format(time.UnixDate))
+			if note.GetUpdatedAt().IsValid() {
+				log.Println("Updated at:", note.GetUpdatedAt().AsTime().In(loc).Format(time.UnixDate))
 			} else {
 				log.Println("Updated at: Note has never been updated")
 			}
