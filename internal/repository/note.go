@@ -5,18 +5,18 @@ import (
 	"database/sql"
 	"time"
 
-	"google.golang.org/protobuf/types/known/timestamppb"
-
 	"github.com/Journeyman150/note-service-api/internal/repository/table"
 	desc "github.com/Journeyman150/note-service-api/pkg/note_v1"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type NoteRepository interface {
 	CreateNote(ctx context.Context, req *desc.CreateNoteRequest) (int64, error)
 	GetNote(ctx context.Context, req *desc.GetNoteRequest) (*desc.GetNoteResponse, error)
 	GetListNote(ctx context.Context, req *desc.GetListNoteRequest) (*desc.GetListNoteResponse, error)
+	UpdateNote(ctx context.Context, req *desc.UpdateNoteRequest) (sql.Result, error)
 }
 
 type repository struct {
@@ -136,4 +136,33 @@ func (r repository) GetListNote(ctx context.Context, req *desc.GetListNoteReques
 	return &desc.GetListNoteResponse{
 		Notes: noteList,
 	}, err
+}
+
+func (r repository) UpdateNote(ctx context.Context, req *desc.UpdateNoteRequest) (sql.Result, error) {
+	builder := sq.Update(table.Note)
+
+	if len(req.GetTitle()) != 0 {
+		builder = builder.Set("title", req.GetTitle())
+	}
+	if len(req.GetText()) != 0 {
+		builder = builder.Set("text", req.GetText())
+	}
+	if len(req.GetAuthor()) != 0 {
+		builder = builder.Set("author", req.GetAuthor())
+	}
+
+	builder = builder.Set("updated_at", time.Now().UTC().Format(time.RFC3339)).
+		Where(sq.Eq{"id": req.GetId()}).
+		PlaceholderFormat(sq.Dollar)
+
+	query, args, err := builder.ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	result, err := r.db.ExecContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
