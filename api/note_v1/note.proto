@@ -20,7 +20,11 @@ service NoteV1 {
             get: "/note/v1/get/{id}"
         };
     }
-    rpc GetListNote (GetListNoteRequest) returns (GetListNoteResponse);
+    rpc GetListNote (GetListNoteRequest) returns (GetListNoteResponse) {
+        option (google.api.http) = {
+            get: "/note/v1/get-list"
+        };
+    }
     rpc Update (UpdateNoteRequest) returns (Empty);
     rpc DeleteNote (DeleteNoteRequest) returns (Empty);
 }

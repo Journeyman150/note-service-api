@@ -16,6 +16,7 @@ import (
 type NoteRepository interface {
 	CreateNote(ctx context.Context, req *desc.CreateNoteRequest) (int64, error)
 	GetNote(ctx context.Context, req *desc.GetNoteRequest) (*desc.GetNoteResponse, error)
+	GetListNote(ctx context.Context, req *desc.GetListNoteRequest) (*desc.GetListNoteResponse, error)
 }
 
 type repository struct {
@@ -92,4 +93,47 @@ func (r repository) GetNote(ctx context.Context, req *desc.GetNoteRequest) (*des
 		CreatedAt: timestamppb.New(createdAt),
 		UpdatedAt: timestamppb.New(updatedAt),
 	}, nil
+}
+
+func (r repository) GetListNote(ctx context.Context, req *desc.GetListNoteRequest) (*desc.GetListNoteResponse, error) {
+	builder := sq.Select("id, title, text, author, created_at, updated_at").
+		From(table.Note).
+		PlaceholderFormat(sq.Dollar)
+
+	query, args, err := builder.ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	row, err := r.db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer row.Close()
+	var id int64
+	var title, text, author string
+	var createdAt time.Time
+	var nullableUpdatedAt sql.NullTime
+	noteList := make([]*desc.GetNoteResponse, 0, 10)
+	for row.Next() {
+		err = row.Scan(&id, &title, &text, &author, &createdAt, &nullableUpdatedAt)
+		var updatedAt time.Time
+		if nullableUpdatedAt.Valid {
+			updatedAt = nullableUpdatedAt.Time
+		}
+		noteList = append(noteList, &desc.GetNoteResponse{
+			Id:        id,
+			Title:     title,
+			Text:      text,
+			Author:    author,
+			CreatedAt: timestamppb.New(createdAt),
+			UpdatedAt: timestamppb.New(updatedAt),
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &desc.GetListNoteResponse{
+		Notes: noteList,
+	}, err
 }
