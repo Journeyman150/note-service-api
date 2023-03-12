@@ -17,6 +17,7 @@ type NoteRepository interface {
 	GetNote(ctx context.Context, req *desc.GetNoteRequest) (*desc.GetNoteResponse, error)
 	GetListNote(ctx context.Context, req *desc.GetListNoteRequest) (*desc.GetListNoteResponse, error)
 	UpdateNote(ctx context.Context, req *desc.UpdateNoteRequest) (sql.Result, error)
+	DeleteNote(ctx context.Context, req *desc.DeleteNoteRequest) (sql.Result, error)
 }
 
 type repository struct {
@@ -165,4 +166,21 @@ func (r repository) UpdateNote(ctx context.Context, req *desc.UpdateNoteRequest)
 		return nil, err
 	}
 	return result, nil
+}
+
+func (r repository) DeleteNote(ctx context.Context, req *desc.DeleteNoteRequest) (sql.Result, error) {
+	builder := sq.Delete(table.Note).
+		Where(sq.Eq{"id": req.GetId()}).
+		PlaceholderFormat(sq.Dollar)
+
+	query, args, err := builder.ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	result, err := r.db.ExecContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	return result, err
 }

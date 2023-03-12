@@ -31,7 +31,12 @@ service NoteV1 {
             body: "*"
         };
     }
-    rpc DeleteNote (DeleteNoteRequest) returns (Empty);
+    rpc DeleteNote (DeleteNoteRequest) returns (Empty) {
+        option (google.api.http) = {
+            delete: "/note/v1/delete"
+            body: "*"
+        };
+    }
 }
 
 message CreateNoteRequest {
@@ -73,7 +78,7 @@ message UpdateNoteRequest {
 }
 
 message DeleteNoteRequest {
-    int64 id = 1;
+    int64 id = 1 [(validate.rules).int64.gte = 1];
 }
 
 message Empty {}
