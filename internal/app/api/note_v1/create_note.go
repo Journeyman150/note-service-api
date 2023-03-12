@@ -2,20 +2,9 @@ package note_v1
 
 import (
 	"context"
-	"fmt"
 
 	desc "github.com/Journeyman150/note-service-api/pkg/note_v1"
 	_ "github.com/jackc/pgx/stdlib"
-)
-
-const (
-	noteTable  = "note"
-	host       = "localhost"
-	port       = "54321"
-	dbUser     = "note-service-user"
-	dbPassword = "note-service-password"
-	dbName     = "note-service"
-	sslMode    = "disable"
 )
 
 func (n *Note) CreateNote(ctx context.Context, req *desc.CreateNoteRequest) (*desc.CreateNoteResponse, error) {
@@ -23,11 +12,5 @@ func (n *Note) CreateNote(ctx context.Context, req *desc.CreateNoteRequest) (*de
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("Create Note")
-	fmt.Println("title:", req.GetTitle())
-	fmt.Println("text:", req.GetText())
-	fmt.Println("author:", req.GetAuthor())
-	fmt.Println("email:", req.GetEmail())
-	fmt.Println()
 	return res, nil
 }
