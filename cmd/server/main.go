@@ -41,11 +41,17 @@ func main() {
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
-		startGRPC()
+		err := startGRPC()
+		if err != nil {
+			log.Fatalf("error in startGrpc(): %s", err)
+		}
 	}()
 	go func() {
 		defer wg.Done()
-		startHttp()
+		err := startHttp()
+		if err != nil {
+			log.Fatalf("error in startHttp(): %s", err)
+		}
 	}()
 
 	wg.Wait()

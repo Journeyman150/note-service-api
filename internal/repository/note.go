@@ -136,7 +136,7 @@ func (r repository) GetListNote(ctx context.Context, req *desc.GetListNoteReques
 	}
 	return &desc.GetListNoteResponse{
 		Notes: noteList,
-	}, err
+	}, nil
 }
 
 func (r repository) UpdateNote(ctx context.Context, req *desc.UpdateNoteRequest) (sql.Result, error) {
@@ -182,5 +182,5 @@ func (r repository) DeleteNote(ctx context.Context, req *desc.DeleteNoteRequest)
 	if err != nil {
 		return nil, err
 	}
-	return result, err
+	return result, nil
 }

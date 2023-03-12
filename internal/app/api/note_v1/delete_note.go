@@ -11,5 +11,5 @@ func (n *Note) DeleteNote(ctx context.Context, req *desc.DeleteNoteRequest) (*de
 	if err != nil {
 		return nil, err
 	}
-	return res, err
+	return res, nil
 }
