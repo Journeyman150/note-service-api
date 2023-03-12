@@ -42,6 +42,37 @@
           "NoteV1"
         ]
       }
+    },
+    "/note/v1/get/{id}": {
+      "get": {
+        "operationId": "NoteV1_GetNote",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/note_v1GetNoteResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "NoteV1"
+        ]
+      }
     }
   },
   "definitions": {
@@ -88,6 +119,10 @@
     "note_v1GetNoteResponse": {
       "type": "object",
       "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
         "title": {
           "type": "string"
         },
