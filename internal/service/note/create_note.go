@@ -11,6 +11,7 @@ func (s *Service) CreateNote(ctx context.Context, req *desc.CreateNoteRequest) (
 	if err != nil {
 		return nil, err
 	}
+
 	return &desc.CreateNoteResponse{
 		Id: id,
 	}, nil

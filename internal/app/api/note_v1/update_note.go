@@ -12,5 +12,6 @@ func (n *Note) Update(ctx context.Context, req *desc.UpdateNoteRequest) (*emptyp
 	if err != nil {
 		return &emptypb.Empty{}, err
 	}
+
 	return &emptypb.Empty{}, nil
 }

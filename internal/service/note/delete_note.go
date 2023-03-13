@@ -11,5 +11,6 @@ func (s *Service) DeleteNote(ctx context.Context, req *desc.DeleteNoteRequest) e
 	if err != nil {
 		return err
 	}
+
 	return nil
 }

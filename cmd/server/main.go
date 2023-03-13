@@ -106,5 +106,6 @@ func startHttp() error {
 		log.Fatalf("failed to serve: %s", err.Error())
 		return err
 	}
+
 	return nil
 }

@@ -12,5 +12,6 @@ func (n *Note) DeleteNote(ctx context.Context, req *desc.DeleteNoteRequest) (*em
 	if err != nil {
 		return &emptypb.Empty{}, err
 	}
+
 	return &emptypb.Empty{}, nil
 }

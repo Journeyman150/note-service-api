@@ -11,5 +11,6 @@ func (s *Service) GetListNote(ctx context.Context, req *desc.GetListNoteRequest)
 	if err != nil {
 		return nil, err
 	}
+
 	return res, nil
 }

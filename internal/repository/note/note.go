@@ -15,7 +15,7 @@ const (
 	tableName = "note"
 )
 
-type NoteRepository interface {
+type Repository interface {
 	CreateNote(ctx context.Context, req *desc.CreateNoteRequest) (int64, error)
 	GetNote(ctx context.Context, req *desc.GetNoteRequest) (*desc.GetNoteResponse, error)
 	GetListNote(ctx context.Context, req *desc.GetListNoteRequest) (*desc.GetListNoteResponse, error)
@@ -27,7 +27,7 @@ type repository struct {
 	db *sqlx.DB
 }
 
-func NewNoteRepository(db *sqlx.DB) NoteRepository {
+func NewNoteRepository(db *sqlx.DB) Repository {
 	return &repository{
 		db: db,
 	}
@@ -57,6 +57,7 @@ func (r repository) CreateNote(ctx context.Context, req *desc.CreateNoteRequest)
 	if err != nil {
 		return 0, err
 	}
+
 	return id, nil
 }
 
@@ -77,18 +78,23 @@ func (r repository) GetNote(ctx context.Context, req *desc.GetNoteRequest) (*des
 	}
 	defer row.Close()
 
-	row.Next()
 	var title, text, author, email string
 	var createdAt time.Time
 	var nullableUpdatedAt sql.NullTime
-	err = row.Scan(&title, &text, &author, &email, &createdAt, &nullableUpdatedAt)
-	if err != nil {
-		return nil, err
-	}
 	var updatedAt time.Time
-	if nullableUpdatedAt.Valid {
-		updatedAt = nullableUpdatedAt.Time
+
+	if row.Next() {
+		err = row.Scan(&title, &text, &author, &email, &createdAt, &nullableUpdatedAt)
+		if err != nil {
+			return nil, err
+		}
+		if nullableUpdatedAt.Valid {
+			updatedAt = nullableUpdatedAt.Time
+		}
+	} else {
+		return &desc.GetNoteResponse{}, nil
 	}
+
 	return &desc.GetNoteResponse{
 		Id:        req.GetId(),
 		Title:     title,
@@ -139,6 +145,7 @@ func (r repository) GetListNote(ctx context.Context, req *desc.GetListNoteReques
 			return nil, err
 		}
 	}
+
 	return &desc.GetListNoteResponse{
 		Notes: noteList,
 	}, nil
@@ -173,6 +180,7 @@ func (r repository) UpdateNote(ctx context.Context, req *desc.UpdateNoteRequest)
 	if err != nil {
 		return nil, err
 	}
+
 	return result, nil
 }
 
@@ -190,5 +198,6 @@ func (r repository) DeleteNote(ctx context.Context, req *desc.DeleteNoteRequest)
 	if err != nil {
 		return nil, err
 	}
+
 	return result, nil
 }

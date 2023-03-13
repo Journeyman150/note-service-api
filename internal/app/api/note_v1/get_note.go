@@ -11,5 +11,6 @@ func (n *Note) GetNote(ctx context.Context, req *desc.GetNoteRequest) (*desc.Get
 	if err != nil {
 		return nil, err
 	}
+
 	return res, nil
 }

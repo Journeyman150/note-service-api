@@ -11,5 +11,6 @@ func (s *Service) UpdateNote(ctx context.Context, req *desc.UpdateNoteRequest) e
 	if err != nil {
 		return err
 	}
+
 	return nil
 }

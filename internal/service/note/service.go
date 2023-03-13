@@ -5,10 +5,10 @@ import (
 )
 
 type Service struct {
-	noteRepository note.NoteRepository
+	noteRepository note.Repository
 }
 
-func NewService(noteRepository note.NoteRepository) *Service {
+func NewService(noteRepository note.Repository) *Service {
 	return &Service{
 		noteRepository: noteRepository,
 	}
