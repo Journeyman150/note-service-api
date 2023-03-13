@@ -92,8 +92,8 @@ func main() {
 	newText := "updated text"
 	_, err = client.Update(context.Background(), &desc.UpdateNoteRequest{
 		Id:    3,
-		Title: &newTitle,
-		Text:  &newText,
+		Title: newTitle,
+		Text:  newText,
 	})
 	if err != nil {
 		log.Println(err.Error())

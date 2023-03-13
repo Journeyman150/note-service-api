@@ -1,9 +1,17 @@
 PHONY: generate
 generate:
 		mkdir -p pkg/note_v1
-		protoc 	--proto_path=api/note_v1 --proto_path=vendor.protogen --go_opt=paths=source_relative \
-				--go_out=pkg/note_v1  --go-grpc_opt=paths=source_relative \
-				--go-grpc_out=pkg/note_v1 api/note_v1/note.proto
+		protoc 	--proto_path=api/note_v1 --proto_path=vendor.protogen \
+				--go_opt=paths=source_relative --go_out=pkg/note_v1  \
+				--go-grpc_opt=paths=source_relative --go-grpc_out=pkg/note_v1 \
+				--grpc-gateway_out=pkg/note_v1 \
+				--grpc-gateway_opt=allow_delete_body=true \
+				--grpc-gateway_opt=logtostderr=true \
+				--grpc-gateway_opt=paths=source_relative \
+				--validate_opt=paths=source_relative --validate_out lang=go:pkg/note_v1 \
+				--swagger_out=allow_merge=true,merge_file_name=api:pkg/note_v1 \
+				--swagger_opt=allow_delete_body=true \
+				api/note_v1/note.proto
 
 PHONY: vendor-proto
 vendor-proto:
