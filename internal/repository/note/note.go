@@ -1,15 +1,18 @@
-package repository
+package note
 
 import (
 	"context"
 	"database/sql"
 	"time"
 
-	"github.com/Journeyman150/note-service-api/internal/repository/table"
 	desc "github.com/Journeyman150/note-service-api/pkg/note_v1"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
 	"google.golang.org/protobuf/types/known/timestamppb"
+)
+
+const (
+	tableName = "note"
 )
 
 type NoteRepository interface {
@@ -31,9 +34,9 @@ func NewNoteRepository(db *sqlx.DB) NoteRepository {
 }
 
 func (r repository) CreateNote(ctx context.Context, req *desc.CreateNoteRequest) (int64, error) {
-	builder := sq.Insert(table.Note).
-		Columns("title, text, author").
-		Values(req.GetTitle(), req.GetText(), req.GetAuthor()).
+	builder := sq.Insert(tableName).
+		Columns("title, text, author, email").
+		Values(req.GetTitle(), req.GetText(), req.GetAuthor(), req.GetEmail()).
 		Suffix("returning id").
 		PlaceholderFormat(sq.Dollar)
 
@@ -58,8 +61,8 @@ func (r repository) CreateNote(ctx context.Context, req *desc.CreateNoteRequest)
 }
 
 func (r repository) GetNote(ctx context.Context, req *desc.GetNoteRequest) (*desc.GetNoteResponse, error) {
-	builder := sq.Select("title, text, author, created_at, updated_at").
-		From(table.Note).
+	builder := sq.Select("title, text, author, email, created_at, updated_at").
+		From(tableName).
 		Where(sq.Eq{"id": req.GetId()}).
 		PlaceholderFormat(sq.Dollar)
 
@@ -75,10 +78,10 @@ func (r repository) GetNote(ctx context.Context, req *desc.GetNoteRequest) (*des
 	defer row.Close()
 
 	row.Next()
-	var title, text, author string
+	var title, text, author, email string
 	var createdAt time.Time
 	var nullableUpdatedAt sql.NullTime
-	err = row.Scan(&title, &text, &author, &createdAt, &nullableUpdatedAt)
+	err = row.Scan(&title, &text, &author, &email, &createdAt, &nullableUpdatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -91,14 +94,15 @@ func (r repository) GetNote(ctx context.Context, req *desc.GetNoteRequest) (*des
 		Title:     title,
 		Text:      text,
 		Author:    author,
+		Email:     email,
 		CreatedAt: timestamppb.New(createdAt),
 		UpdatedAt: timestamppb.New(updatedAt),
 	}, nil
 }
 
 func (r repository) GetListNote(ctx context.Context, req *desc.GetListNoteRequest) (*desc.GetListNoteResponse, error) {
-	builder := sq.Select("id, title, text, author, created_at, updated_at").
-		From(table.Note).
+	builder := sq.Select("id, title, text, author, email, created_at, updated_at").
+		From(tableName).
 		PlaceholderFormat(sq.Dollar)
 
 	query, args, err := builder.ToSql()
@@ -112,12 +116,12 @@ func (r repository) GetListNote(ctx context.Context, req *desc.GetListNoteReques
 	}
 	defer row.Close()
 	var id int64
-	var title, text, author string
+	var title, text, author, email string
 	var createdAt time.Time
 	var nullableUpdatedAt sql.NullTime
 	noteList := make([]*desc.GetNoteResponse, 0, 10)
 	for row.Next() {
-		err = row.Scan(&id, &title, &text, &author, &createdAt, &nullableUpdatedAt)
+		err = row.Scan(&id, &title, &text, &author, &email, &createdAt, &nullableUpdatedAt)
 		var updatedAt time.Time
 		if nullableUpdatedAt.Valid {
 			updatedAt = nullableUpdatedAt.Time
@@ -127,6 +131,7 @@ func (r repository) GetListNote(ctx context.Context, req *desc.GetListNoteReques
 			Title:     title,
 			Text:      text,
 			Author:    author,
+			Email:     email,
 			CreatedAt: timestamppb.New(createdAt),
 			UpdatedAt: timestamppb.New(updatedAt),
 		})
@@ -140,7 +145,7 @@ func (r repository) GetListNote(ctx context.Context, req *desc.GetListNoteReques
 }
 
 func (r repository) UpdateNote(ctx context.Context, req *desc.UpdateNoteRequest) (sql.Result, error) {
-	builder := sq.Update(table.Note)
+	builder := sq.Update(tableName)
 
 	if len(req.GetTitle()) != 0 {
 		builder = builder.Set("title", req.GetTitle())
@@ -150,6 +155,9 @@ func (r repository) UpdateNote(ctx context.Context, req *desc.UpdateNoteRequest)
 	}
 	if len(req.GetAuthor()) != 0 {
 		builder = builder.Set("author", req.GetAuthor())
+	}
+	if len(req.GetEmail()) != 0 {
+		builder = builder.Set("email", req.GetEmail())
 	}
 
 	builder = builder.Set("updated_at", time.Now().UTC().Format(time.RFC3339)).
@@ -169,7 +177,7 @@ func (r repository) UpdateNote(ctx context.Context, req *desc.UpdateNoteRequest)
 }
 
 func (r repository) DeleteNote(ctx context.Context, req *desc.DeleteNoteRequest) (sql.Result, error) {
-	builder := sq.Delete(table.Note).
+	builder := sq.Delete(tableName).
 		Where(sq.Eq{"id": req.GetId()}).
 		PlaceholderFormat(sq.Dollar)
 

@@ -4,9 +4,10 @@ package api.note_v1;
 
 option go_package = "github.com/Journeyman150/note-service-api/pkg/note_v1";
 
-import "google/api/annotations.proto";
 import "validate/validate.proto";
+import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
 
 service NoteV1 {
     rpc CreateNote (CreateNoteRequest) returns (CreateNoteResponse) {
@@ -25,13 +26,13 @@ service NoteV1 {
             get: "/note/v1/get-list"
         };
     }
-    rpc Update (UpdateNoteRequest) returns (Empty) {
+    rpc Update (UpdateNoteRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             put: "/note/v1/update"
             body: "*"
         };
     }
-    rpc DeleteNote (DeleteNoteRequest) returns (Empty) {
+    rpc DeleteNote (DeleteNoteRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             delete: "/note/v1/delete"
             body: "*"
@@ -59,8 +60,9 @@ message GetNoteResponse {
     string title = 2;
     string text = 3;
     string author = 4;
-    google.protobuf.Timestamp created_at = 5;
-    google.protobuf.Timestamp updated_at = 6;
+    string email = 5;
+    google.protobuf.Timestamp created_at = 6;
+    google.protobuf.Timestamp updated_at = 7;
 }
 
 message GetListNoteRequest {}
@@ -80,5 +82,3 @@ message UpdateNoteRequest {
 message DeleteNoteRequest {
     int64 id = 1 [(validate.rules).int64.gte = 1];
 }
-
-message Empty {}

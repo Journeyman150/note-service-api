@@ -8,16 +8,14 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/jmoiron/sqlx"
-
-	"github.com/Journeyman150/note-service-api/internal/repository"
-
-	"github.com/Journeyman150/note-service-api/internal/service/note"
-
 	"github.com/Journeyman150/note-service-api/internal/app/api/note_v1"
+	noteRepository "github.com/Journeyman150/note-service-api/internal/repository/note"
+	noteService "github.com/Journeyman150/note-service-api/internal/service/note"
 	desc "github.com/Journeyman150/note-service-api/pkg/note_v1"
 	grpcValidator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	_ "github.com/jackc/pgx/stdlib"
+	"github.com/jmoiron/sqlx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -76,8 +74,8 @@ func startGRPC() error {
 	}
 	defer db.Close()
 
-	noteRepository := repository.NewNoteRepository(db)
-	noteService := note.NewService(noteRepository)
+	noteRepository := noteRepository.NewNoteRepository(db)
+	noteService := noteService.NewService(noteRepository)
 
 	desc.RegisterNoteV1Server(s, note_v1.NewNote(noteService))
 	fmt.Printf("grpc server is running on port%s\n", hostGrpc)

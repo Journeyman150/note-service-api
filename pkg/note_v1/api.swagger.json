@@ -50,7 +50,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/note_v1Empty"
+              "properties": {}
             }
           },
           "default": {
@@ -135,7 +135,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/note_v1Empty"
+              "properties": {}
             }
           },
           "default": {
@@ -197,9 +197,6 @@
         }
       }
     },
-    "note_v1Empty": {
-      "type": "object"
-    },
     "note_v1GetListNoteResponse": {
       "type": "object",
       "properties": {
@@ -225,6 +222,9 @@
           "type": "string"
         },
         "author": {
+          "type": "string"
+        },
+        "email": {
           "type": "string"
         },
         "created_at": {

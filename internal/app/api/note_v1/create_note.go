@@ -4,7 +4,6 @@ import (
 	"context"
 
 	desc "github.com/Journeyman150/note-service-api/pkg/note_v1"
-	_ "github.com/jackc/pgx/stdlib"
 )
 
 func (n *Note) CreateNote(ctx context.Context, req *desc.CreateNoteRequest) (*desc.CreateNoteResponse, error) {
