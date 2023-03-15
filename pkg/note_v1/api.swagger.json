@@ -165,17 +165,8 @@
     "note_v1CreateNoteRequest": {
       "type": "object",
       "properties": {
-        "title": {
-          "type": "string"
-        },
-        "text": {
-          "type": "string"
-        },
-        "author": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
+        "noteInfo": {
+          "$ref": "#/definitions/note_v1NoteInfo"
         }
       }
     },
@@ -215,6 +206,22 @@
           "type": "string",
           "format": "int64"
         },
+        "noteInfo": {
+          "$ref": "#/definitions/note_v1NoteInfo"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "note_v1NoteInfo": {
+      "type": "object",
+      "properties": {
         "title": {
           "type": "string"
         },
@@ -226,14 +233,6 @@
         },
         "email": {
           "type": "string"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "updated_at": {
-          "type": "string",
-          "format": "date-time"
         }
       }
     },

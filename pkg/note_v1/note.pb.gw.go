@@ -22,6 +22,7 @@ import (
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // Suppress "imported and not used" errors
@@ -122,7 +123,7 @@ func local_request_NoteV1_GetNote_0(ctx context.Context, marshaler runtime.Marsh
 }
 
 func request_NoteV1_GetListNote_0(ctx context.Context, marshaler runtime.Marshaler, client NoteV1Client, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetListNoteRequest
+	var protoReq emptypb.Empty
 	var metadata runtime.ServerMetadata
 
 	msg, err := client.GetListNote(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -131,7 +132,7 @@ func request_NoteV1_GetListNote_0(ctx context.Context, marshaler runtime.Marshal
 }
 
 func local_request_NoteV1_GetListNote_0(ctx context.Context, marshaler runtime.Marshaler, server NoteV1Server, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetListNoteRequest
+	var protoReq emptypb.Empty
 	var metadata runtime.ServerMetadata
 
 	msg, err := server.GetListNote(ctx, &protoReq)
