@@ -194,12 +194,20 @@
         "notes": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/note_v1GetNoteResponse"
+            "$ref": "#/definitions/note_v1Note"
           }
         }
       }
     },
     "note_v1GetNoteResponse": {
+      "type": "object",
+      "properties": {
+        "note": {
+          "$ref": "#/definitions/note_v1Note"
+        }
+      }
+    },
+    "note_v1Note": {
       "type": "object",
       "properties": {
         "id": {
@@ -236,13 +244,9 @@
         }
       }
     },
-    "note_v1UpdateNoteRequest": {
+    "note_v1UpdateNoteInfo": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string",
-          "format": "int64"
-        },
         "title": {
           "type": "string"
         },
@@ -254,6 +258,18 @@
         },
         "email": {
           "type": "string"
+        }
+      }
+    },
+    "note_v1UpdateNoteRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updateNoteInfo": {
+          "$ref": "#/definitions/note_v1UpdateNoteInfo"
         }
       }
     },

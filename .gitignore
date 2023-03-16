@@ -2,3 +2,6 @@
 .idea
 ### Downloaded dependencies ###
 vendor.protogen
+
+### built project ###
+main.exe

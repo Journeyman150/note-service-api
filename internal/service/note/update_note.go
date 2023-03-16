@@ -6,8 +6,8 @@ import (
 	"github.com/Journeyman150/note-service-api/internal/model"
 )
 
-func (s *Service) UpdateNote(ctx context.Context, req *model.UpdateNoteRequest) error {
-	_, err := s.noteRepository.UpdateNote(ctx, req)
+func (s *Service) UpdateNote(ctx context.Context, id int64, noteInfo *model.UpdateNoteInfo) error {
+	_, err := s.noteRepository.UpdateNote(ctx, id, noteInfo)
 	if err != nil {
 		return err
 	}

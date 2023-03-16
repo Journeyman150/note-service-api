@@ -12,17 +12,16 @@ type NoteInfo struct {
 	Email  string `db:"email"`
 }
 
-type GetNoteResponse struct {
-	Id        int64        `db:"id"`
-	Info      *NoteInfo    `db:""`
-	CreatedAt time.Time    `db:"created_at"`
-	UpdatedAt sql.NullTime `db:"updated_at"`
-}
-
-type UpdateNoteRequest struct {
-	Id     int64          `db:"id"`
+type UpdateNoteInfo struct {
 	Title  sql.NullString `db:"title"`
 	Text   sql.NullString `db:"text"`
 	Author sql.NullString `db:"author"`
 	Email  sql.NullString `db:"email"`
+}
+
+type Note struct {
+	Id        int64        `db:"id"`
+	Info      *NoteInfo    `db:""`
+	CreatedAt time.Time    `db:"created_at"`
+	UpdatedAt sql.NullTime `db:"updated_at"`
 }

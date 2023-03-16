@@ -27,66 +27,65 @@ func ToDescNoteInfo(noteInfo *model.NoteInfo) *desc.NoteInfo {
 	}
 }
 
-func ToGetNoteResponse(getNoteResponse *desc.GetNoteResponse) *model.GetNoteResponse {
+func ToNote(note *desc.Note) *model.Note {
 	updatedAt := sql.NullTime{
-		Time:  getNoteResponse.GetUpdatedAt().AsTime(),
-		Valid: getNoteResponse.GetUpdatedAt().IsValid(),
+		Time:  note.GetUpdatedAt().AsTime(),
+		Valid: note.GetUpdatedAt().IsValid(),
 	}
 
-	return &model.GetNoteResponse{
-		Id:        getNoteResponse.GetId(),
-		Info:      ToNoteInfo(getNoteResponse.GetNoteInfo()),
-		CreatedAt: getNoteResponse.GetCreatedAt().AsTime(),
+	return &model.Note{
+		Id:        note.GetId(),
+		Info:      ToNoteInfo(note.GetNoteInfo()),
+		CreatedAt: note.GetCreatedAt().AsTime(),
 		UpdatedAt: updatedAt,
 	}
 }
 
-func ToDescGetNoteResponse(getNoteResponse *model.GetNoteResponse) *desc.GetNoteResponse {
+func ToDescNote(note *model.Note) *desc.Note {
 	var updatedAt *timestamppb.Timestamp
-	if getNoteResponse.UpdatedAt.Valid {
-		updatedAt = timestamppb.New(getNoteResponse.UpdatedAt.Time)
+	if note.UpdatedAt.Valid {
+		updatedAt = timestamppb.New(note.UpdatedAt.Time)
 	}
 
-	return &desc.GetNoteResponse{
-		Id:        getNoteResponse.Id,
-		NoteInfo:  ToDescNoteInfo(getNoteResponse.Info),
-		CreatedAt: timestamppb.New(getNoteResponse.CreatedAt),
+	return &desc.Note{
+		Id:        note.Id,
+		NoteInfo:  ToDescNoteInfo(note.Info),
+		CreatedAt: timestamppb.New(note.CreatedAt),
 		UpdatedAt: updatedAt,
 	}
 }
 
-func ToDescGetListNoteResponse(getListNoteResponse []*model.GetNoteResponse) *desc.GetListNoteResponse {
-	res := make([]*desc.GetNoteResponse, 0, len(getListNoteResponse))
-	for i := range getListNoteResponse {
-		res = append(res, ToDescGetNoteResponse(getListNoteResponse[i]))
+func ToDescListNote(notes []*model.Note) []*desc.Note {
+	res := make([]*desc.Note, 0, len(notes))
+	for i := range notes {
+		res = append(res, ToDescNote(notes[i]))
 	}
 
-	return &desc.GetListNoteResponse{Notes: res}
+	return res
 }
 
-func ToUpdateNoteRequest(updateNoteRequest *desc.UpdateNoteRequest) *model.UpdateNoteRequest {
-	title := sql.NullString{String: updateNoteRequest.GetTitle().GetValue()}
-	if updateNoteRequest.GetTitle() != nil {
+func ToUpdateNoteInfo(noteInfo *desc.UpdateNoteInfo) *model.UpdateNoteInfo {
+	title := sql.NullString{String: noteInfo.GetTitle().GetValue()}
+	if noteInfo.GetTitle() != nil {
 		title.Valid = true
 	}
 
-	text := sql.NullString{String: updateNoteRequest.GetText().GetValue()}
-	if updateNoteRequest.GetText() != nil {
+	text := sql.NullString{String: noteInfo.GetText().GetValue()}
+	if noteInfo.GetText() != nil {
 		text.Valid = true
 	}
 
-	author := sql.NullString{String: updateNoteRequest.GetAuthor().GetValue()}
-	if updateNoteRequest.GetAuthor() != nil {
+	author := sql.NullString{String: noteInfo.GetAuthor().GetValue()}
+	if noteInfo.GetAuthor() != nil {
 		author.Valid = true
 	}
 
-	email := sql.NullString{String: updateNoteRequest.GetEmail().GetValue()}
-	if updateNoteRequest.GetEmail() != nil {
+	email := sql.NullString{String: noteInfo.GetEmail().GetValue()}
+	if noteInfo.GetEmail() != nil {
 		email.Valid = true
 	}
 
-	return &model.UpdateNoteRequest{
-		Id:     updateNoteRequest.GetId(),
+	return &model.UpdateNoteInfo{
 		Title:  title,
 		Text:   text,
 		Author: author,
@@ -94,24 +93,23 @@ func ToUpdateNoteRequest(updateNoteRequest *desc.UpdateNoteRequest) *model.Updat
 	}
 }
 
-func ToDescUpdateNoteRequest(updateNoteRequest *model.UpdateNoteRequest) *desc.UpdateNoteRequest {
+func ToDescUpdateNoteInfo(noteInfo *model.UpdateNoteInfo) *desc.UpdateNoteInfo {
 	var title, text, author, email *wrapperspb.StringValue
 
-	if updateNoteRequest.Title.Valid {
-		title = &wrapperspb.StringValue{Value: updateNoteRequest.Title.String}
+	if noteInfo.Title.Valid {
+		title = &wrapperspb.StringValue{Value: noteInfo.Title.String}
 	}
-	if updateNoteRequest.Text.Valid {
-		text = &wrapperspb.StringValue{Value: updateNoteRequest.Text.String}
+	if noteInfo.Text.Valid {
+		text = &wrapperspb.StringValue{Value: noteInfo.Text.String}
 	}
-	if updateNoteRequest.Author.Valid {
-		author = &wrapperspb.StringValue{Value: updateNoteRequest.Author.String}
+	if noteInfo.Author.Valid {
+		author = &wrapperspb.StringValue{Value: noteInfo.Author.String}
 	}
-	if updateNoteRequest.Email.Valid {
-		email = &wrapperspb.StringValue{Value: updateNoteRequest.Email.String}
+	if noteInfo.Email.Valid {
+		email = &wrapperspb.StringValue{Value: noteInfo.Email.String}
 	}
 
-	return &desc.UpdateNoteRequest{
-		Id:     updateNoteRequest.Id,
+	return &desc.UpdateNoteInfo{
 		Title:  title,
 		Text:   text,
 		Author: author,

@@ -9,10 +9,12 @@ import (
 )
 
 func (n *Note) GetListNote(ctx context.Context, _ *emptypb.Empty) (*desc.GetListNoteResponse, error) {
-	res, err := n.noteService.GetListNote(ctx)
+	notes, err := n.noteService.GetListNote(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return converter.ToDescGetListNoteResponse(res), nil
+	return &desc.GetListNoteResponse{
+		Notes: converter.ToDescListNote(notes),
+	}, nil
 }

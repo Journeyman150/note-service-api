@@ -16,9 +16,9 @@ const (
 
 type Repository interface {
 	CreateNote(ctx context.Context, noteInfo *model.NoteInfo) (int64, error)
-	GetNote(ctx context.Context, id int64) (*model.GetNoteResponse, error)
-	GetListNote(ctx context.Context) ([]*model.GetNoteResponse, error)
-	UpdateNote(ctx context.Context, req *model.UpdateNoteRequest) (pgconn.CommandTag, error)
+	GetNote(ctx context.Context, id int64) (*model.Note, error)
+	GetListNote(ctx context.Context) ([]*model.Note, error)
+	UpdateNote(ctx context.Context, id int64, req *model.UpdateNoteInfo) (pgconn.CommandTag, error)
 	DeleteNote(ctx context.Context, id int64) (pgconn.CommandTag, error)
 }
 
@@ -65,7 +65,7 @@ func (r repository) CreateNote(ctx context.Context, noteInfo *model.NoteInfo) (i
 	return id, nil
 }
 
-func (r repository) GetNote(ctx context.Context, id int64) (*model.GetNoteResponse, error) {
+func (r repository) GetNote(ctx context.Context, id int64) (*model.Note, error) {
 	builder := sq.Select("id, title, text, author, email, created_at, updated_at").
 		From(tableName).
 		Where(sq.Eq{"id": id}).
@@ -81,7 +81,7 @@ func (r repository) GetNote(ctx context.Context, id int64) (*model.GetNoteRespon
 		QueryRaw: query,
 	}
 
-	getNoteResponse := new(model.GetNoteResponse)
+	getNoteResponse := new(model.Note)
 	err = r.client.DB().GetContext(ctx, getNoteResponse, q, args...)
 	if err != nil {
 		return nil, err
@@ -90,7 +90,7 @@ func (r repository) GetNote(ctx context.Context, id int64) (*model.GetNoteRespon
 	return getNoteResponse, nil
 }
 
-func (r repository) GetListNote(ctx context.Context) ([]*model.GetNoteResponse, error) {
+func (r repository) GetListNote(ctx context.Context) ([]*model.Note, error) {
 	builder := sq.Select("id, title, text, author, email, created_at, updated_at").
 		From(tableName).
 		PlaceholderFormat(sq.Dollar)
@@ -105,30 +105,30 @@ func (r repository) GetListNote(ctx context.Context) ([]*model.GetNoteResponse, 
 		QueryRaw: query,
 	}
 
-	var notes []*model.GetNoteResponse
+	var notes []*model.Note
 	err = r.client.DB().SelectContext(ctx, &notes, q, args...)
 
 	return notes, nil
 }
 
-func (r repository) UpdateNote(ctx context.Context, req *model.UpdateNoteRequest) (pgconn.CommandTag, error) {
+func (r repository) UpdateNote(ctx context.Context, id int64, noteInfo *model.UpdateNoteInfo) (pgconn.CommandTag, error) {
 	builder := sq.Update(tableName)
 
-	if req.Title.Valid {
-		builder = builder.Set("title", req.Title)
+	if noteInfo.Title.Valid {
+		builder = builder.Set("title", noteInfo.Title)
 	}
-	if req.Text.Valid {
-		builder = builder.Set("text", req.Text)
+	if noteInfo.Text.Valid {
+		builder = builder.Set("text", noteInfo.Text)
 	}
-	if req.Author.Valid {
-		builder = builder.Set("author", req.Author)
+	if noteInfo.Author.Valid {
+		builder = builder.Set("author", noteInfo.Author)
 	}
-	if req.Email.Valid {
-		builder = builder.Set("email", req.Email)
+	if noteInfo.Email.Valid {
+		builder = builder.Set("email", noteInfo.Email)
 	}
 
 	builder = builder.Set("updated_at", time.Now().UTC().Format(time.RFC3339)).
-		Where(sq.Eq{"id": req.Id}).
+		Where(sq.Eq{"id": id}).
 		PlaceholderFormat(sq.Dollar)
 
 	query, args, err := builder.ToSql()
