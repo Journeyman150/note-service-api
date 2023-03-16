@@ -8,6 +8,8 @@ import (
 	desc "github.com/Journeyman150/note-service-api/pkg/note_v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 const address = "localhost:50051"
@@ -23,9 +25,12 @@ func main() {
 
 	//create
 	res, err := client.CreateNote(context.Background(), &desc.CreateNoteRequest{
-		Title:  "Some title",
-		Text:   "Some text",
-		Author: "Some author",
+		NoteInfo: &desc.NoteInfo{
+			Title:  "Title",
+			Text:   "Text",
+			Author: "Author",
+			Email:  "Email",
+		},
 	})
 	if err != nil {
 		log.Println(err.Error())
@@ -48,19 +53,19 @@ func main() {
 	}
 
 	log.Println("Note with Id =", id, "received")
-	log.Println("Title:", get.GetTitle())
-	log.Println("Author:", get.GetAuthor())
-	log.Println("Text:", get.GetText())
-	log.Println("Created at:", get.GetCreatedAt().AsTime().In(loc).Format(time.UnixDate))
-	if get.GetUpdatedAt().IsValid() {
-		log.Println("Updated at:", get.GetUpdatedAt().AsTime().In(loc).Format(time.UnixDate))
+	log.Println("Title:", get.GetNote().GetNoteInfo().GetTitle())
+	log.Println("Author:", get.GetNote().GetNoteInfo().GetAuthor())
+	log.Println("Text:", get.GetNote().GetNoteInfo().GetText())
+	log.Println("Created at:", get.GetNote().GetCreatedAt().AsTime().In(loc).Format(time.UnixDate))
+	if get.GetNote().GetUpdatedAt().IsValid() {
+		log.Println("Updated at:", get.GetNote().GetUpdatedAt().AsTime().In(loc).Format(time.UnixDate))
 	} else {
 		log.Println("Updated at: Note has never been updated")
 	}
 	log.Println()
 
 	//getList
-	getList, err := client.GetListNote(context.Background(), &desc.GetListNoteRequest{})
+	getList, err := client.GetListNote(context.Background(), &emptypb.Empty{})
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -70,11 +75,11 @@ func main() {
 	}
 	if len(getList.Notes) != 0 {
 		log.Println("All notes received")
-		for i, note := range getList.Notes {
+		for i, note := range getList.GetNotes() {
 			log.Println("Note", i+1)
-			log.Println("Title:", note.GetTitle())
-			log.Println("Author:", note.GetAuthor())
-			log.Println("Text:", note.GetText())
+			log.Println("Title:", note.GetNoteInfo().GetTitle())
+			log.Println("Author:", note.GetNoteInfo().GetAuthor())
+			log.Println("Text:", note.GetNoteInfo().GetText())
 			log.Println("Created at:", note.GetCreatedAt().AsTime().In(loc).Format(time.UnixDate))
 			if note.GetUpdatedAt().IsValid() {
 				log.Println("Updated at:", note.GetUpdatedAt().AsTime().In(loc).Format(time.UnixDate))
@@ -91,9 +96,11 @@ func main() {
 	newTitle := "updated title"
 	newText := "updated text"
 	_, err = client.Update(context.Background(), &desc.UpdateNoteRequest{
-		Id:    3,
-		Title: newTitle,
-		Text:  newText,
+		Id: 3,
+		UpdateNoteInfo: &desc.UpdateNoteInfo{
+			Title: wrapperspb.String(newTitle),
+			Text:  wrapperspb.String(newText),
+		},
 	})
 	if err != nil {
 		log.Println(err.Error())

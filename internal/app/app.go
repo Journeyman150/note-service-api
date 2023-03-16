@@ -139,10 +139,6 @@ func (a *App) startGRPC() error {
 }
 
 func (a *App) startHttp() error {
-	ctx := context.Background()
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
 	fmt.Printf("http server is running on host%s\n", a.httpAddress)
 	if err := http.ListenAndServe(a.httpAddress, a.mux); err != nil {
 		log.Fatalf("failed to serve: %s", err.Error())
