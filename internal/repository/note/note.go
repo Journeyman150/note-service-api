@@ -7,7 +7,6 @@ import (
 	"github.com/Journeyman150/note-service-api/internal/model"
 	"github.com/Journeyman150/note-service-api/internal/pkg/db"
 	sq "github.com/Masterminds/squirrel"
-	"github.com/jackc/pgconn"
 )
 
 const (
@@ -18,8 +17,8 @@ type Repository interface {
 	CreateNote(ctx context.Context, noteInfo *model.NoteInfo) (int64, error)
 	GetNote(ctx context.Context, id int64) (*model.Note, error)
 	GetListNote(ctx context.Context) ([]*model.Note, error)
-	UpdateNote(ctx context.Context, id int64, req *model.UpdateNoteInfo) (pgconn.CommandTag, error)
-	DeleteNote(ctx context.Context, id int64) (pgconn.CommandTag, error)
+	UpdateNote(ctx context.Context, id int64, req *model.UpdateNoteInfo) error
+	DeleteNote(ctx context.Context, id int64) error
 }
 
 type repository struct {
@@ -114,7 +113,7 @@ func (r repository) GetListNote(ctx context.Context) ([]*model.Note, error) {
 	return notes, nil
 }
 
-func (r repository) UpdateNote(ctx context.Context, id int64, noteInfo *model.UpdateNoteInfo) (pgconn.CommandTag, error) {
+func (r repository) UpdateNote(ctx context.Context, id int64, noteInfo *model.UpdateNoteInfo) error {
 	builder := sq.Update(tableName)
 
 	if noteInfo.Title.Valid {
@@ -136,7 +135,7 @@ func (r repository) UpdateNote(ctx context.Context, id int64, noteInfo *model.Up
 
 	query, args, err := builder.ToSql()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	q := db.Query{
@@ -144,22 +143,22 @@ func (r repository) UpdateNote(ctx context.Context, id int64, noteInfo *model.Up
 		QueryRaw: query,
 	}
 
-	result, err := r.client.DB().ExecContext(ctx, q, args...)
+	_, err = r.client.DB().ExecContext(ctx, q, args...)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return result, nil
+	return nil
 }
 
-func (r repository) DeleteNote(ctx context.Context, id int64) (pgconn.CommandTag, error) {
+func (r repository) DeleteNote(ctx context.Context, id int64) error {
 	builder := sq.Delete(tableName).
 		Where(sq.Eq{"id": id}).
 		PlaceholderFormat(sq.Dollar)
 
 	query, args, err := builder.ToSql()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	q := db.Query{
@@ -167,10 +166,10 @@ func (r repository) DeleteNote(ctx context.Context, id int64) (pgconn.CommandTag
 		QueryRaw: query,
 	}
 
-	result, err := r.client.DB().ExecContext(ctx, q, args...)
+	_, err = r.client.DB().ExecContext(ctx, q, args...)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return result, nil
+	return nil
 }

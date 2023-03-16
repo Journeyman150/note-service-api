@@ -11,7 +11,7 @@ import (
 func (n *Note) Update(ctx context.Context, req *desc.UpdateNoteRequest) (*emptypb.Empty, error) {
 	err := n.noteService.UpdateNote(ctx, req.GetId(), converter.ToUpdateNoteInfo(req.UpdateNoteInfo))
 	if err != nil {
-		return &emptypb.Empty{}, err
+		return nil, err
 	}
 
 	return &emptypb.Empty{}, nil

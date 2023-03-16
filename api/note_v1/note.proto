@@ -49,10 +49,10 @@ message NoteInfo {
 }
 
 message UpdateNoteInfo {
-    google.protobuf.StringValue title = 2 [(validate.rules).string = {min_len: 3, max_len: 100}];
-    google.protobuf.StringValue text = 3 [(validate.rules).string = {min_len: 10, max_len: 10000}];
-    google.protobuf.StringValue author = 4 [(validate.rules).string = {min_len: 2, max_len: 100}];
-    google.protobuf.StringValue email = 5 [(validate.rules).string = {email: true}];
+    google.protobuf.StringValue title = 1 [(validate.rules).string = {min_len: 3, max_len: 100}];
+    google.protobuf.StringValue text = 2 [(validate.rules).string = {min_len: 10, max_len: 10000}];
+    google.protobuf.StringValue author = 3 [(validate.rules).string = {min_len: 2, max_len: 100}];
+    google.protobuf.StringValue email = 4 [(validate.rules).string = {email: true}];
 }
 
 message Note {

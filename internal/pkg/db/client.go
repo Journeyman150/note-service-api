@@ -32,9 +32,6 @@ func NewClient(ctx context.Context, config *pgxpool.Config) (Client, error) {
 
 func (c *client) Close() error {
 	if c != nil {
-		if c.closeFunc != nil {
-			c.closeFunc()
-		}
 		if c.db != nil {
 			c.db.pool.Close()
 		}

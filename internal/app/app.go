@@ -57,20 +57,24 @@ func (a *App) Run() error {
 	defer func() {
 		a.serviceProvider.db.Close()
 	}()
+
 	wg := sync.WaitGroup{}
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
+
 		err := a.startGRPC()
 		if err != nil {
-			log.Fatalf("error in startGrpc(): %s", err)
+			log.Fatalf("failed to start grpc server: %s", err)
 		}
 	}()
+
 	go func() {
 		defer wg.Done()
+
 		err := a.startHttp()
 		if err != nil {
-			log.Fatalf("error in startHttp(): %s", err)
+			log.Fatalf("failed to start http server: %s", err)
 		}
 	}()
 

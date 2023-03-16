@@ -7,7 +7,7 @@ import (
 )
 
 func (s *Service) UpdateNote(ctx context.Context, id int64, noteInfo *model.UpdateNoteInfo) error {
-	_, err := s.noteRepository.UpdateNote(ctx, id, noteInfo)
+	err := s.noteRepository.UpdateNote(ctx, id, noteInfo)
 	if err != nil {
 		return err
 	}
