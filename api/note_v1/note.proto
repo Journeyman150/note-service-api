@@ -8,6 +8,7 @@ import "validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
 
 service NoteV1 {
     rpc CreateNote (CreateNoteRequest) returns (CreateNoteResponse) {
@@ -21,7 +22,7 @@ service NoteV1 {
             get: "/note/v1/get/{id}"
         };
     }
-    rpc GetListNote (GetListNoteRequest) returns (GetListNoteResponse) {
+    rpc GetListNote (google.protobuf.Empty) returns (GetListNoteResponse) {
         option (google.api.http) = {
             get: "/note/v1/get-list"
         };
@@ -40,11 +41,29 @@ service NoteV1 {
     }
 }
 
-message CreateNoteRequest {
+message NoteInfo {
     string title = 1 [(validate.rules).string = {min_len: 3, max_len: 100}];
     string text = 2 [(validate.rules).string = {min_len: 10, max_len: 10000}];
     string author = 3 [(validate.rules).string = {min_len: 2, max_len: 100}];
-    string email = 4 [(validate.rules).string.email = true];
+    string email = 4 [(validate.rules).string = {email: true}];
+}
+
+message UpdateNoteInfo {
+    google.protobuf.StringValue title = 1 [(validate.rules).string = {min_len: 3, max_len: 100}];
+    google.protobuf.StringValue text = 2 [(validate.rules).string = {min_len: 10, max_len: 10000}];
+    google.protobuf.StringValue author = 3 [(validate.rules).string = {min_len: 2, max_len: 100}];
+    google.protobuf.StringValue email = 4 [(validate.rules).string = {email: true}];
+}
+
+message Note {
+    int64 id = 1;
+    NoteInfo noteInfo = 2;
+    google.protobuf.Timestamp created_at = 3;
+    google.protobuf.Timestamp updated_at = 4;
+}
+
+message CreateNoteRequest {
+    NoteInfo noteInfo = 1;
 }
 
 message CreateNoteResponse {
@@ -56,27 +75,16 @@ message GetNoteRequest {
 }
 
 message GetNoteResponse {
-    int64 id = 1;
-    string title = 2;
-    string text = 3;
-    string author = 4;
-    string email = 5;
-    google.protobuf.Timestamp created_at = 6;
-    google.protobuf.Timestamp updated_at = 7;
+    Note note = 1;
 }
 
-message GetListNoteRequest {}
-
 message GetListNoteResponse {
-    repeated GetNoteResponse notes = 1;
+    repeated Note notes = 1;
 }
 
 message UpdateNoteRequest {
     int64 id = 1 [(validate.rules).int64.gte = 1];
-    string title = 2 [(validate.rules).string = {ignore_empty: true, min_len: 3, max_len: 100}];
-    string text = 3 [(validate.rules).string = {ignore_empty: true, min_len: 10, max_len: 10000}];
-    string author = 4 [(validate.rules).string = {ignore_empty: true, min_len: 2, max_len: 100}];
-    string email = 5 [(validate.rules).string = {ignore_empty: true, email: true}];
+    UpdateNoteInfo updateNoteInfo = 2;
 }
 
 message DeleteNoteRequest {

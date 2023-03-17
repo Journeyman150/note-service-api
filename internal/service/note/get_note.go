@@ -3,14 +3,14 @@ package note
 import (
 	"context"
 
-	desc "github.com/Journeyman150/note-service-api/pkg/note_v1"
+	"github.com/Journeyman150/note-service-api/internal/model"
 )
 
-func (s *Service) GetNote(ctx context.Context, req *desc.GetNoteRequest) (*desc.GetNoteResponse, error) {
-	res, err := s.noteRepository.GetNote(ctx, req)
+func (s *Service) GetNote(ctx context.Context, id int64) (*model.Note, error) {
+	note, err := s.noteRepository.GetNote(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	return res, nil
+	return note, nil
 }
