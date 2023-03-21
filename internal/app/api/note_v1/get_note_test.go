@@ -68,42 +68,10 @@ func Test_GetNote(t *testing.T) {
 		noteService: note.NewMockNoteService(noteRepoMock),
 	})
 
-	//fmt.Println("Test_GetNote variables:\n",
-	//	"id:", validId,
-	//	"title:", validTitle,
-	//	"text:", validText,
-	//	"author:", validAuthor,
-	//	"email:", validEmail,
-	//	"createdAt:", timestamppb.New(validCreatedAt),
-	//	"updatedAt:", timestamppb.New(validUpdatedAt.Time),
-	//	"\nRequest id:", validReq.GetId(),
-	//	"\ntest error text:", repoErrText,
-	//)
-
-	// fmt.Println("Test_GetNote expect returning variables:\n",
-	// 	"id:", validRes.GetNote().GetId(),
-	// 	"title:", validRes.GetNote().GetNoteInfo().GetTitle(),
-	// 	"text:", validRes.GetNote().GetNoteInfo().GetText(),
-	// 	"author:", validRes.GetNote().GetNoteInfo().GetAuthor(),
-	// 	"email:", validRes.GetNote().GetNoteInfo().GetEmail(),
-	// 	"createdAt:", validRes.GetNote().GetCreatedAt(),
-	// 	"updatedAt:", validRes.GetNote().GetUpdatedAt(),
-	// )
-
 	t.Run("success GetNote case", func(t *testing.T) {
 		noteRepoMock.EXPECT().GetNote(ctx, validReq.GetId()).Return(validRepoNote, nil)
 
 		res, err := api.GetNote(ctx, validReq)
-
-		//fmt.Println("Test_GetNote returning variables:\n",
-		//	"id:", res.GetNote().GetId(),
-		//	"title:", res.GetNote().GetNoteInfo().GetTitle(),
-		//	"text:", res.GetNote().GetNoteInfo().GetText(),
-		//	"author:", res.GetNote().GetNoteInfo().GetAuthor(),
-		//	"email:", res.GetNote().GetNoteInfo().GetEmail(),
-		//	"createdAt:", res.GetNote().GetCreatedAt(),
-		//	"updatedAt:", res.GetNote().GetUpdatedAt(),
-		//)
 
 		require.Equal(t, validRes, res)
 		require.Nil(t, err)

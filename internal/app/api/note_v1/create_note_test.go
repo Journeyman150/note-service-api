@@ -50,14 +50,6 @@ func Test_CreateNote(t *testing.T) {
 		noteService: note.NewMockNoteService(noteRepoMock),
 	})
 
-	//fmt.Println("Test_CreateNote variables:\n",
-	//	"title:", validReq.NoteInfo.GetTitle(),
-	//	"text:", validReq.NoteInfo.GetText(),
-	//	"author:", validReq.NoteInfo.GetAuthor(),
-	//	"email:", validReq.NoteInfo.GetEmail(),
-	//	"\nid:", validRes.GetId(),
-	//	"\ntest error text:", repoErrText)
-
 	t.Run("success CreateNote case", func(t *testing.T) {
 		noteRepoMock.EXPECT().CreateNote(ctx, validNoteInfoModel).Return(validResId, nil)
 

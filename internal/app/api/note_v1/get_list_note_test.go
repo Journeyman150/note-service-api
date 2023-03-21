@@ -61,7 +61,6 @@ func Test_GetListNote(t *testing.T) {
 		res, err := api.GetListNote(ctx, &emptypb.Empty{})
 
 		require.Equal(t, validRes, res)
-		//require.ElementsMatch(t, validRes.GetNotes(), res.GetNotes())
 		require.Nil(t, err)
 	})
 
