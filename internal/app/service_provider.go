@@ -4,8 +4,11 @@ import (
 	"context"
 	"log"
 
+	"github.com/Journeyman150/note-service-api/internal/pkg/db/transaction"
+
 	"github.com/Journeyman150/note-service-api/internal/config"
 	"github.com/Journeyman150/note-service-api/internal/pkg/db"
+	noteLog "github.com/Journeyman150/note-service-api/internal/repository/log"
 	noteRepo "github.com/Journeyman150/note-service-api/internal/repository/note"
 	noteService "github.com/Journeyman150/note-service-api/internal/service/note"
 )
@@ -16,7 +19,10 @@ type serviceProvider struct {
 	config     *config.Config
 
 	noteRepository noteRepo.Repository
-	noteService    *noteService.Service
+	logRepository  noteLog.Repository
+	txManager      transaction.Manager
+
+	noteService *noteService.Service
 }
 
 func newServiceProvider(configPath string) *serviceProvider {
@@ -63,9 +69,29 @@ func (s *serviceProvider) GetNoteRepository(ctx context.Context) noteRepo.Reposi
 	return s.noteRepository
 }
 
+func (s *serviceProvider) GetLogRepository(ctx context.Context) noteLog.Repository {
+	if s.logRepository == nil {
+		s.logRepository = noteLog.NewLogRepository(s.GetDB(ctx))
+	}
+
+	return s.logRepository
+}
+
+func (s *serviceProvider) GetTxManager(ctx context.Context) transaction.Manager {
+	if s.txManager == nil {
+		s.txManager = transaction.NewTransactionManager(s.GetDB(ctx).DB())
+	}
+
+	return s.txManager
+}
+
 func (s *serviceProvider) GetNoteService(ctx context.Context) *noteService.Service {
 	if s.noteService == nil {
-		s.noteService = noteService.NewService(s.GetNoteRepository(ctx))
+		s.noteService = noteService.NewService(
+			s.GetNoteRepository(ctx),
+			s.GetLogRepository(ctx),
+			s.GetTxManager(ctx),
+		)
 	}
 
 	return s.noteService

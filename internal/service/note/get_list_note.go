@@ -7,7 +7,7 @@ import (
 )
 
 func (s *Service) GetListNote(ctx context.Context) ([]*model.Note, error) {
-	notes, err := s.noteRepository.GetListNote(ctx)
+	notes, err := s.noteRepository.GetList(ctx)
 	if err != nil {
 		return nil, err
 	}
