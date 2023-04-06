@@ -56,7 +56,7 @@ func Test_GetListNote(t *testing.T) {
 	})
 
 	t.Run("success GetListNote case", func(t *testing.T) {
-		noteRepoMock.EXPECT().GetListNote(ctx).Return(validRepoNotes, nil)
+		noteRepoMock.EXPECT().GetList(ctx).Return(validRepoNotes, nil)
 
 		res, err := api.GetListNote(ctx, &emptypb.Empty{})
 
@@ -65,7 +65,7 @@ func Test_GetListNote(t *testing.T) {
 	})
 
 	t.Run("note repo returning error to GetListNote", func(t *testing.T) {
-		noteRepoMock.EXPECT().GetListNote(ctx).Return(nil, repoErr)
+		noteRepoMock.EXPECT().GetList(ctx).Return(nil, repoErr)
 
 		res, err := api.GetListNote(ctx, &emptypb.Empty{})
 

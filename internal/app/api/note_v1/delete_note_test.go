@@ -4,6 +4,14 @@ import (
 	"context"
 	"testing"
 
+	"github.com/Journeyman150/note-service-api/internal/pkg/db"
+	dbMocks "github.com/Journeyman150/note-service-api/internal/pkg/db/mocksDB"
+	txMocks "github.com/Journeyman150/note-service-api/internal/pkg/db/mocksTx"
+	"github.com/Journeyman150/note-service-api/internal/pkg/db/transaction"
+	logMocks "github.com/Journeyman150/note-service-api/internal/repository/log/mocks"
+	pgxV4 "github.com/jackc/pgx/v4"
+	"github.com/pkg/errors"
+
 	noteMocks "github.com/Journeyman150/note-service-api/internal/repository/note/mocks"
 	"github.com/Journeyman150/note-service-api/internal/service/note"
 	desc "github.com/Journeyman150/note-service-api/pkg/note_v1"
@@ -18,34 +26,57 @@ func Test_DeleteNote(t *testing.T) {
 		ctx      = context.Background()
 		mockCtrl = gomock.NewController(t)
 
-		id       = gofakeit.Int64()
-		validReq = &desc.DeleteNoteRequest{Id: id}
+		noteId   = gofakeit.Int64()
+		validReq = &desc.DeleteNoteRequest{Id: noteId}
+		validRes = &emptypb.Empty{}
 
-		repoErr     = gofakeit.Error()
-		repoErrText = repoErr.Error()
+		repoErr = gofakeit.Error()
 	)
 
 	noteRepoMock := noteMocks.NewMockRepository(mockCtrl)
+	logRepoMock := logMocks.NewMockRepository(mockCtrl)
+
+	dbMock := dbMocks.NewMockDB(mockCtrl)
+	txMock := txMocks.NewMockTx(mockCtrl)
+	trManagerMock := transaction.NewMockTransactionManager(dbMock)
+	txCtx := db.GetContextTx(ctx, txMock)
+
 	api := NewMockNoteV1(Note{
-		noteService: note.NewMockNoteService(noteRepoMock),
+		noteService: note.NewMockNoteService(noteRepoMock, logRepoMock, trManagerMock),
 	})
 
 	t.Run("success DeleteNote case", func(t *testing.T) {
-		noteRepoMock.EXPECT().DeleteNote(ctx, validReq.GetId()).Return(nil)
+		dbMock.EXPECT().BeginTx(ctx, pgxV4.TxOptions{IsoLevel: pgxV4.ReadCommitted}).Return(txMock, nil)
+		noteRepoMock.EXPECT().Delete(txCtx, noteId).Return(nil)
+		logRepoMock.EXPECT().Delete(txCtx, noteId).Return(nil)
+		txMock.EXPECT().Commit(txCtx).Return(nil)
 
-		empty, err := api.DeleteNote(ctx, validReq)
+		res, err := api.DeleteNote(ctx, validReq)
 
-		require.Equal(t, &emptypb.Empty{}, empty)
 		require.Nil(t, err)
+		require.Equal(t, validRes, res)
 	})
 
-	t.Run("note repo returning error to DeleteNote", func(t *testing.T) {
-		noteRepoMock.EXPECT().DeleteNote(ctx, validReq.GetId()).Return(repoErr)
+	t.Run("note repository returning error to Delete", func(t *testing.T) {
+		dbMock.EXPECT().BeginTx(ctx, pgxV4.TxOptions{IsoLevel: pgxV4.ReadCommitted}).Return(txMock, nil)
+		logRepoMock.EXPECT().Delete(txCtx, noteId).Return(nil)
+		noteRepoMock.EXPECT().Delete(txCtx, noteId).Return(repoErr)
+		txMock.EXPECT().Rollback(txCtx).Return(nil)
 
-		empty, err := api.DeleteNote(ctx, validReq)
+		_, err := api.DeleteNote(ctx, validReq)
 
-		require.Nil(t, empty)
 		require.NotNil(t, err)
-		require.Equal(t, repoErrText, err.Error())
+		require.Equal(t, errors.Wrap(repoErr, "failed executing code inside transaction").Error(), err.Error())
+	})
+
+	t.Run("log repository returning error to Delete", func(t *testing.T) {
+		dbMock.EXPECT().BeginTx(ctx, pgxV4.TxOptions{IsoLevel: pgxV4.ReadCommitted}).Return(txMock, nil)
+		logRepoMock.EXPECT().Delete(txCtx, noteId).Return(repoErr)
+		txMock.EXPECT().Rollback(txCtx).Return(nil)
+
+		_, err := api.DeleteNote(ctx, validReq)
+
+		require.NotNil(t, err)
+		require.Equal(t, errors.Wrap(repoErr, "failed executing code inside transaction").Error(), err.Error())
 	})
 }

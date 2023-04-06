@@ -31,6 +31,10 @@ func NewMockNoteService(deps ...interface{}) *Service {
 		switch s := v.(type) {
 		case note.Repository:
 			service.noteRepository = s
+		case noteLog.Repository:
+			service.logRepository = s
+		case transaction.Manager:
+			service.txManager = s
 		}
 	}
 

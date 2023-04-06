@@ -2,9 +2,22 @@ package note_v1
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
+	"github.com/pkg/errors"
+
+	"github.com/Journeyman150/note-service-api/internal/pkg/db"
+
+	pgxV4 "github.com/jackc/pgx/v4"
+
+	"github.com/Journeyman150/note-service-api/internal/pkg/db/transaction"
+
+	dbMocks "github.com/Journeyman150/note-service-api/internal/pkg/db/mocksDB"
+	txMocks "github.com/Journeyman150/note-service-api/internal/pkg/db/mocksTx"
+
 	"github.com/Journeyman150/note-service-api/internal/model"
+	logMocks "github.com/Journeyman150/note-service-api/internal/repository/log/mocks"
 	noteMocks "github.com/Journeyman150/note-service-api/internal/repository/note/mocks"
 	"github.com/Journeyman150/note-service-api/internal/service/note"
 	desc "github.com/Journeyman150/note-service-api/pkg/note_v1"
@@ -25,8 +38,7 @@ func Test_CreateNote(t *testing.T) {
 
 		validResId = gofakeit.Int64()
 
-		repoErr     = gofakeit.Error()
-		repoErrText = repoErr.Error()
+		repoErr = gofakeit.Error()
 
 		validReq = &desc.CreateNoteRequest{NoteInfo: &desc.NoteInfo{
 			Title:  validTitle,
@@ -43,15 +55,30 @@ func Test_CreateNote(t *testing.T) {
 		}
 
 		validRes = &desc.CreateNoteResponse{Id: validResId}
+
+		validLog = &model.Log{
+			NoteId: validResId,
+			Msg:    fmt.Sprintf("note with id %d was created", validResId),
+		}
 	)
 
 	noteRepoMock := noteMocks.NewMockRepository(mockCtrl)
+	logRepoMock := logMocks.NewMockRepository(mockCtrl)
+
+	dbMock := dbMocks.NewMockDB(mockCtrl)
+	txMock := txMocks.NewMockTx(mockCtrl)
+	trManagerMock := transaction.NewMockTransactionManager(dbMock)
+	txCtx := db.GetContextTx(ctx, txMock)
+
 	api := NewMockNoteV1(Note{
-		noteService: note.NewMockNoteService(noteRepoMock),
+		noteService: note.NewMockNoteService(noteRepoMock, logRepoMock, trManagerMock),
 	})
 
 	t.Run("success CreateNote case", func(t *testing.T) {
-		noteRepoMock.EXPECT().CreateNote(ctx, validNoteInfoModel).Return(validResId, nil)
+		dbMock.EXPECT().BeginTx(ctx, pgxV4.TxOptions{IsoLevel: pgxV4.ReadCommitted}).Return(txMock, nil)
+		noteRepoMock.EXPECT().Create(txCtx, validNoteInfoModel).Return(validResId, nil)
+		logRepoMock.EXPECT().Create(txCtx, validLog).Return(nil)
+		txMock.EXPECT().Commit(txCtx).Return(nil)
 
 		res, err := api.CreateNote(ctx, validReq)
 
@@ -59,12 +86,26 @@ func Test_CreateNote(t *testing.T) {
 		require.Equal(t, validRes, res)
 	})
 
-	t.Run("note repository returning error to CreateNote", func(t *testing.T) {
-		noteRepoMock.EXPECT().CreateNote(ctx, validNoteInfoModel).Return(int64(0), repoErr)
+	t.Run("note repository returning error to Create", func(t *testing.T) {
+		dbMock.EXPECT().BeginTx(ctx, pgxV4.TxOptions{IsoLevel: pgxV4.ReadCommitted}).Return(txMock, nil)
+		noteRepoMock.EXPECT().Create(txCtx, validNoteInfoModel).Return(int64(0), repoErr)
+		txMock.EXPECT().Rollback(txCtx).Return(nil)
 
 		_, err := api.CreateNote(ctx, validReq)
 
 		require.NotNil(t, err)
-		require.Equal(t, repoErrText, err.Error())
+		require.Equal(t, errors.Wrap(repoErr, "failed executing code inside transaction").Error(), err.Error())
+	})
+
+	t.Run("log repository returning error to Create", func(t *testing.T) {
+		dbMock.EXPECT().BeginTx(ctx, pgxV4.TxOptions{IsoLevel: pgxV4.ReadCommitted}).Return(txMock, nil)
+		noteRepoMock.EXPECT().Create(txCtx, validNoteInfoModel).Return(validResId, nil)
+		logRepoMock.EXPECT().Create(txCtx, validLog).Return(repoErr)
+		txMock.EXPECT().Rollback(txCtx).Return(nil)
+
+		_, err := api.CreateNote(ctx, validReq)
+
+		require.NotNil(t, err)
+		require.Equal(t, errors.Wrap(repoErr, "failed executing code inside transaction").Error(), err.Error())
 	})
 }

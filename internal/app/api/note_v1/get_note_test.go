@@ -69,7 +69,7 @@ func Test_GetNote(t *testing.T) {
 	})
 
 	t.Run("success GetNote case", func(t *testing.T) {
-		noteRepoMock.EXPECT().GetNote(ctx, validReq.GetId()).Return(validRepoNote, nil)
+		noteRepoMock.EXPECT().Get(ctx, validReq.GetId()).Return(validRepoNote, nil)
 
 		res, err := api.GetNote(ctx, validReq)
 
@@ -78,7 +78,7 @@ func Test_GetNote(t *testing.T) {
 	})
 
 	t.Run("note repo returning error to GetNote", func(t *testing.T) {
-		noteRepoMock.EXPECT().GetNote(ctx, validReq.GetId()).Return(nil, repoErr)
+		noteRepoMock.EXPECT().Get(ctx, validReq.GetId()).Return(nil, repoErr)
 
 		res, err := api.GetNote(ctx, validReq)
 

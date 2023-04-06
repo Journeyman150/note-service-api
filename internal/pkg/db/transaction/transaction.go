@@ -1,9 +1,12 @@
 package transaction
 
+//go:generate mockgen --build_flags=--mod=mod -destination=mocks/mock_transaction.go -package=mocks . Manager
+
 import (
 	"context"
 
 	"github.com/Journeyman150/note-service-api/internal/pkg/db"
+	mocks "github.com/Journeyman150/note-service-api/internal/pkg/db/mocksDB"
 	pgxV4 "github.com/jackc/pgx/v4"
 	"github.com/pkg/errors"
 )
@@ -78,4 +81,10 @@ func (s *manager) RepeatableRead(ctx context.Context, f Handler) error {
 func (s *manager) Serializable(ctx context.Context, f Handler) error {
 	txOptions := pgxV4.TxOptions{IsoLevel: pgxV4.Serializable}
 	return s.transaction(ctx, txOptions, f)
+}
+
+func NewMockTransactionManager(db *mocks.MockDB) *manager {
+	return &manager{
+		db: db,
+	}
 }
