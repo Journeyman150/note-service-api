@@ -6,20 +6,19 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/Journeyman150/note-service-api/internal/model"
 	"github.com/Journeyman150/note-service-api/internal/pkg/db"
 	dbMocks "github.com/Journeyman150/note-service-api/internal/pkg/db/mocksDB"
 	txMocks "github.com/Journeyman150/note-service-api/internal/pkg/db/mocksTx"
 	"github.com/Journeyman150/note-service-api/internal/pkg/db/transaction"
 	logMocks "github.com/Journeyman150/note-service-api/internal/repository/log/mocks"
-	pgxV4 "github.com/jackc/pgx/v4"
-	"github.com/pkg/errors"
-
-	"github.com/Journeyman150/note-service-api/internal/model"
 	noteMocks "github.com/Journeyman150/note-service-api/internal/repository/note/mocks"
 	"github.com/Journeyman150/note-service-api/internal/service/note"
 	desc "github.com/Journeyman150/note-service-api/pkg/note_v1"
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/golang/mock/gomock"
+	pgxV4 "github.com/jackc/pgx/v4"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
@@ -36,7 +35,9 @@ func Test_UpdateNote(t *testing.T) {
 		author = gofakeit.Name()
 		email  = gofakeit.Email()
 
-		repoErr = gofakeit.Error()
+		repoErr   = gofakeit.Error()
+		txErr     = errors.Wrap(repoErr, "failed executing code inside transaction")
+		txErrText = txErr.Error()
 
 		validReq = &desc.UpdateNoteRequest{
 			Id: noteId,
@@ -94,7 +95,7 @@ func Test_UpdateNote(t *testing.T) {
 		_, err := api.Update(ctx, validReq)
 
 		require.NotNil(t, err)
-		require.Equal(t, errors.Wrap(repoErr, "failed executing code inside transaction").Error(), err.Error())
+		require.Equal(t, txErrText, err.Error())
 	})
 
 	t.Run("log repository returning error to Create", func(t *testing.T) {
@@ -106,6 +107,6 @@ func Test_UpdateNote(t *testing.T) {
 		_, err := api.Update(ctx, validReq)
 
 		require.NotNil(t, err)
-		require.Equal(t, errors.Wrap(repoErr, "failed executing code inside transaction").Error(), err.Error())
+		require.Equal(t, txErrText, err.Error())
 	})
 }

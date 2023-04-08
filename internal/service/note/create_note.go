@@ -7,7 +7,7 @@ import (
 	"github.com/Journeyman150/note-service-api/internal/model"
 )
 
-func (s *Service) CreateNote(ctx context.Context, noteInfo *model.NoteInfo) (int64, error) {
+func (s *Service) Create(ctx context.Context, noteInfo *model.NoteInfo) (int64, error) {
 	var noteId int64
 	err := s.txManager.ReadCommitted(ctx, func(ctx context.Context) error {
 		var errTx error

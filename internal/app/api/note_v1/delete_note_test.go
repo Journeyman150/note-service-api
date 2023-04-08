@@ -9,14 +9,13 @@ import (
 	txMocks "github.com/Journeyman150/note-service-api/internal/pkg/db/mocksTx"
 	"github.com/Journeyman150/note-service-api/internal/pkg/db/transaction"
 	logMocks "github.com/Journeyman150/note-service-api/internal/repository/log/mocks"
-	pgxV4 "github.com/jackc/pgx/v4"
-	"github.com/pkg/errors"
-
 	noteMocks "github.com/Journeyman150/note-service-api/internal/repository/note/mocks"
 	"github.com/Journeyman150/note-service-api/internal/service/note"
 	desc "github.com/Journeyman150/note-service-api/pkg/note_v1"
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/golang/mock/gomock"
+	pgxV4 "github.com/jackc/pgx/v4"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -30,7 +29,9 @@ func Test_DeleteNote(t *testing.T) {
 		validReq = &desc.DeleteNoteRequest{Id: noteId}
 		validRes = &emptypb.Empty{}
 
-		repoErr = gofakeit.Error()
+		repoErr   = gofakeit.Error()
+		txErr     = errors.Wrap(repoErr, "failed executing code inside transaction")
+		txErrText = txErr.Error()
 	)
 
 	noteRepoMock := noteMocks.NewMockRepository(mockCtrl)
@@ -66,7 +67,7 @@ func Test_DeleteNote(t *testing.T) {
 		_, err := api.DeleteNote(ctx, validReq)
 
 		require.NotNil(t, err)
-		require.Equal(t, errors.Wrap(repoErr, "failed executing code inside transaction").Error(), err.Error())
+		require.Equal(t, txErrText, err.Error())
 	})
 
 	t.Run("log repository returning error to Delete", func(t *testing.T) {
@@ -77,6 +78,6 @@ func Test_DeleteNote(t *testing.T) {
 		_, err := api.DeleteNote(ctx, validReq)
 
 		require.NotNil(t, err)
-		require.Equal(t, errors.Wrap(repoErr, "failed executing code inside transaction").Error(), err.Error())
+		require.Equal(t, txErrText, err.Error())
 	})
 }

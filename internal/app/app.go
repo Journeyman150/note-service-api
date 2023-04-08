@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/Journeyman150/note-service-api/internal/app/api/note_v1"
 	desc "github.com/Journeyman150/note-service-api/pkg/note_v1"
@@ -72,7 +73,7 @@ func (a *App) Run() error {
 	go func() {
 		defer wg.Done()
 
-		err := a.startHttp()
+		err := a.startHTTP()
 		if err != nil {
 			log.Fatalf("failed to start http server: %s", err)
 		}
@@ -142,9 +143,15 @@ func (a *App) startGRPC() error {
 	return nil
 }
 
-func (a *App) startHttp() error {
+func (a *App) startHTTP() error {
 	fmt.Printf("http server is running on host%s\n", a.httpAddress)
-	if err := http.ListenAndServe(a.httpAddress, a.mux); err != nil {
+	server := &http.Server{
+		Addr:         a.httpAddress,
+		Handler:      a.mux,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 5 * time.Second,
+	}
+	if err := server.ListenAndServe(); err != nil {
 		log.Fatalf("failed to serve: %s", err.Error())
 		return err
 	}
