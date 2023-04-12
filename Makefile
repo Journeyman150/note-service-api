@@ -1,3 +1,15 @@
+.PHONY: lint
+lint:
+	golangci-lint run
+
+.PHONY: build
+build:
+	go build -v ./cmd/server
+
+.PHONY: start
+start:
+	server -config config/config.json
+
 PHONY: generate
 generate:
 		mkdir -p pkg/note_v1

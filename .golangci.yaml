@@ -1,0 +1,59 @@
+# More info on config here: https://golangci-lint.run/usage/configuration/#config-file
+run:
+  concurrency: 6
+  tests: true
+  skip-dirs:
+    - vendor.protogen
+    - pkg
+
+output:
+  format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
+
+linters-settings:
+  govet:
+    check-shadowing: true
+  dupl:
+    threshold: 150
+  goconst:
+    min-len:         3
+    min-occurrences: 2
+  revive:
+    rules:
+      - name: var-naming
+#        disabled: true
+        arguments : [["ID"], []]
+ 
+linters:
+  disable-all: true
+  enable:
+    - dupl # - it's very slow, enable if you really know why you need it
+    - errcheck # *errcheck is a program for checking for unchecked errors in Go code. These unchecked errors can be critical bugs in some cases
+   # - gosimple # *Linter for Go source code that specializes in simplifying code
+   # - staticcheck
+    - goconst # *Finds repeated strings that could be replaced by a constant
+   # - goimports
+    - gosec # *Inspects source code for security problems
+    - govet # *Vet examines Go source code and reports suspicious constructs, such as Printf calls whose arguments do not align with the format string
+    - ineffassign # *Detects when assignments to existing variables are not used
+    - megacheck # (staticcheck + gosimple + unused in one linter)
+    - revive # *Fast, configurable, extensible, flexible, and beautiful linter for Go. Drop-in replacement of golint.
+    - typecheck # *Like the front-end of a Go compiler, parses and type-checks Go code
+    - unused # will be used insted of varcheck + deadcode + structcheck. More info https://github.com/golangci/golangci-lint/issues/1841
+
+#issues:
+#  exclude-use-default: false
+#  exclude:
+#    # _ instead of err checks
+#    - G104
+#    # for "public interface + private struct implementation" cases only!
+#    - exported func .* returns unexported type .*, which can be annoying to use
+#    # can be removed in the development phase
+#    # - (comment on exported (method|function|type|const)|should have( a package)? comment|comment should be of the form)
+#    # not for the active development - can be removed in the stable phase
+#    - should have a package comment
+#    - don't use an underscore in package name
+#    # EXC0001 errcheck: Almost all programs ignore errors on these functions and in most cases it's ok
+#    - Error return value of .((os\.)?std(out|err)\..*|.*Close|.*Flush|os\.Remove(All)?|.*print(f|ln)?|os\.(Un)?Setenv). is not checked
+#    - should check returned error before deferring

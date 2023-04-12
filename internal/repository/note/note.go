@@ -16,11 +16,11 @@ const (
 )
 
 type Repository interface {
-	CreateNote(ctx context.Context, noteInfo *model.NoteInfo) (int64, error)
-	GetNote(ctx context.Context, id int64) (*model.Note, error)
-	GetListNote(ctx context.Context) ([]*model.Note, error)
-	UpdateNote(ctx context.Context, id int64, req *model.UpdateNoteInfo) error
-	DeleteNote(ctx context.Context, id int64) error
+	Create(ctx context.Context, noteInfo *model.NoteInfo) (int64, error)
+	Get(ctx context.Context, id int64) (*model.Note, error)
+	GetList(ctx context.Context) ([]*model.Note, error)
+	Update(ctx context.Context, id int64, req *model.UpdateNoteInfo) error
+	Delete(ctx context.Context, id int64) error
 }
 
 type repository struct {
@@ -33,7 +33,7 @@ func NewNoteRepository(client db.Client) Repository {
 	}
 }
 
-func (r repository) CreateNote(ctx context.Context, noteInfo *model.NoteInfo) (int64, error) {
+func (r *repository) Create(ctx context.Context, noteInfo *model.NoteInfo) (int64, error) {
 	builder := sq.Insert(tableName).
 		Columns("title, text, author, email").
 		Values(noteInfo.Title, noteInfo.Text, noteInfo.Author, noteInfo.Email).
@@ -66,7 +66,7 @@ func (r repository) CreateNote(ctx context.Context, noteInfo *model.NoteInfo) (i
 	return id, nil
 }
 
-func (r repository) GetNote(ctx context.Context, id int64) (*model.Note, error) {
+func (r *repository) Get(ctx context.Context, id int64) (*model.Note, error) {
 	builder := sq.Select("id, title, text, author, email, created_at, updated_at").
 		From(tableName).
 		Where(sq.Eq{"id": id}).
@@ -91,7 +91,7 @@ func (r repository) GetNote(ctx context.Context, id int64) (*model.Note, error) 
 	return getNoteResponse, nil
 }
 
-func (r repository) GetListNote(ctx context.Context) ([]*model.Note, error) {
+func (r *repository) GetList(ctx context.Context) ([]*model.Note, error) {
 	builder := sq.Select("id, title, text, author, email, created_at, updated_at").
 		From(tableName).
 		PlaceholderFormat(sq.Dollar)
@@ -115,7 +115,7 @@ func (r repository) GetListNote(ctx context.Context) ([]*model.Note, error) {
 	return notes, nil
 }
 
-func (r repository) UpdateNote(ctx context.Context, id int64, noteInfo *model.UpdateNoteInfo) error {
+func (r *repository) Update(ctx context.Context, id int64, noteInfo *model.UpdateNoteInfo) error {
 	builder := sq.Update(tableName)
 
 	if noteInfo.Title.Valid {
@@ -153,7 +153,7 @@ func (r repository) UpdateNote(ctx context.Context, id int64, noteInfo *model.Up
 	return nil
 }
 
-func (r repository) DeleteNote(ctx context.Context, id int64) error {
+func (r *repository) Delete(ctx context.Context, id int64) error {
 	builder := sq.Delete(tableName).
 		Where(sq.Eq{"id": id}).
 		PlaceholderFormat(sq.Dollar)

@@ -1,4 +1,4 @@
-package note_v1
+package note_v1 //nolint:revive
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 )
 
 func (n *Note) GetListNote(ctx context.Context, _ *emptypb.Empty) (*desc.GetListNoteResponse, error) {
-	notes, err := n.noteService.GetListNote(ctx)
+	notes, err := n.noteService.GetList(ctx)
 	if err != nil {
 		return nil, err
 	}

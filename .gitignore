@@ -5,6 +5,7 @@ vendor.protogen
 
 ### built project ###
 main.exe
+server.exe
 
 ### test coverage ###
 coverage.out
