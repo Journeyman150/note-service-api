@@ -22,8 +22,8 @@ linters-settings:
   revive:
     rules:
       - name: var-naming
-        disabled: true
-#        arguments : [["ID", "note_v1"], []]
+#        disabled: true
+        arguments : [["ID"], []]
  
 linters:
   disable-all: true

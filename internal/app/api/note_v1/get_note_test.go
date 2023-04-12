@@ -1,4 +1,4 @@
-package note_v1
+package note_v1 //nolint:revive
 
 import (
 	"context"
